@@ -18,7 +18,7 @@ object GUI extends SimpleSwingApplication {
 	val directoryAndFileText : Label = new Label {}
 	var filePath : String = ""
 	var directoryPath : String = System.getProperty("user.dir") + "\\BDD"
-	var directoryFilesName : Array[String] = Import.directoryFilesList(directoryPath)
+	var directoryFilesName : Array[String] = Import.DirectoryFilesList(directoryPath)
 	
 	def top = new MainFrame {
 	  var width : Int = 700
@@ -30,7 +30,7 @@ object GUI extends SimpleSwingApplication {
   	}
     
     if(IsDirectoryFilesAndWav(directoryFilesName, "Aucun fichier dans le dossier par defaut", peer))
-      Import.directoryFilesAnalysis(directoryFilesName, directoryPath)                  //Lancement de l'analyse BDD
+      Import.DirectoryFilesAnalysis(directoryFilesName, directoryPath)                  //Lancement de l'analyse BDD
     else JOptionPane.showMessageDialog(peer, "Attention, le dossier par defaut est vide ou ne contient pas que des fichiers .wav", "Erreur", JOptionPane.ERROR_MESSAGE)
     
   	menuBar = new MenuBar {                                                               //Barre d'options
@@ -42,10 +42,10 @@ object GUI extends SimpleSwingApplication {
 				  
           if(directoryBrowser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {      //Ouverture du selecteur de dossier avec vérification que l'user appuie sur ok
             directoryPath = directoryBrowser.getSelectedFile().getAbsolutePath()
-            directoryFilesName = Import.directoryFilesList(directoryPath)
+            directoryFilesName = Import.DirectoryFilesList(directoryPath)
 
             if(IsDirectoryFilesAndWav(directoryFilesName, "Aucun fichier dans ce dossier", peer))
-              Import.directoryFilesAnalysis(directoryFilesName, directoryPath)                //Lancement de l'analyse BDD
+              Import.DirectoryFilesAnalysis(directoryFilesName, directoryPath)                //Lancement de l'analyse BDD
             else JOptionPane.showMessageDialog(peer, "Veuillez selectionner un dossier non vide ne contenant que des fichiers .wav", "Erreur", JOptionPane.ERROR_MESSAGE)
           }
   	    })
@@ -89,8 +89,8 @@ object GUI extends SimpleSwingApplication {
 				
 		    case ButtonClicked(component)	if component == startButton => {               //Lance l'analyse du fichier
 		      resultText.text = "Analyse en cours..."
-		      var wav2D : Array[Array[Int]] = Import.wavAnalysis(filePath)
-		      FFT.fileFFT(wav2D)
+		      var wav2D : Array[Array[Int]] = Import.WavAnalysis(filePath)
+		      FFT.FileFFT(wav2D)
           println("Frequence d'echantillonage : " + wav2D(0)(0))
           println("Canaux : " + wav2D(0)(1))
           println("Echantillon : " + wav2D(0)(2))
