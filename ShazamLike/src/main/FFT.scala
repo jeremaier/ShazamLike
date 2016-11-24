@@ -9,7 +9,7 @@ object FFT {
   var ham : Array[Double] = Array()
   
   def FileFFT(wav2D : Array[Array[Int]]) {
-    //fichier à analyser wav ici en ce moment
+    //fichier a analyser wav ici en ce moment
     //file = FFT(wav2D)
   }
   

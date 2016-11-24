@@ -12,7 +12,7 @@ import java.awt.Graphics
 
 object GUI extends SimpleSwingApplication {
   val resultText : Label = new Label {
-    text = "Veuillez sélectionner un fichier à analyser"
+    text = "Veuillez selectionner un fichier a analyser"
     font = new Font("SansSerif", Font.PLAIN, 18)
   }
 	val directoryAndFileText : Label = new Label {}
@@ -25,7 +25,7 @@ object GUI extends SimpleSwingApplication {
   	val browseFileButton : Button =	new Button	{text	=	"Parcourir..."}
   	val browseDirectoryButton : Button =	new Button	{text	=	"Changer de dossier..."}
     val startButton : Button =	new Button {                                              //Bouton pour lancer l'analyse
-  		text	=	"Choisissez un fichier .wav à analyser"
+  		text	=	"Choisissez un fichier .wav a analyser"
   		enabled = false
   	}
     
@@ -40,7 +40,7 @@ object GUI extends SimpleSwingApplication {
 	        directoryBrowser.setDialogTitle("Choisir un dossier contenant des sons")
 				  directoryBrowser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
 				  
-          if(directoryBrowser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {      //Ouverture du selecteur de dossier avec vérification que l'user appuie sur ok
+          if(directoryBrowser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {      //Ouverture du selecteur de dossier avec vï¿½rification que l'user appuie sur ok
             directoryPath = directoryBrowser.getSelectedFile().getAbsolutePath()
             directoryFilesName = Import.DirectoryFilesList(directoryPath)
 
@@ -55,7 +55,7 @@ object GUI extends SimpleSwingApplication {
   	  }
   	}
   	
-  	contents = new GridPanel(5, 1) {                                                 //Crée un panel de boutons et de phrase
+  	contents = new GridPanel(5, 1) {                                                 //Cree un panel de boutons et de phrase
   	  RefreshDirectoryAndFileText()
   	  
   	  contents += browseFileButton
@@ -77,13 +77,13 @@ object GUI extends SimpleSwingApplication {
           fileBrowser.setAcceptAllFileFilterUsed(false)
           fileBrowser.addChoosableFileFilter(new FileNameExtensionFilter(".wav", "wav"))
 				  
-          if(fileBrowser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION && IsDirectoryFiles()) {      //Ouverture du selecteur de fichiers avec vérification que l'utilisateur appuie sur OK
+          if(fileBrowser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION && IsDirectoryFiles()) {      //Ouverture du selecteur de fichiers avec vï¿½rification que l'utilisateur appuie sur OK
               filePath = fileBrowser.getSelectedFile.getAbsolutePath()
               RefreshDirectoryAndFileText()
-              resultText.text = "Attente du démarrage de l'analyse"
+              resultText.text = "Attente du demarrage de l'analyse"
               startButton.text = "Lancer l'analyse"
               startButton.enabled = true
-              println("Fichier à analyser: " + filePath)
+              println("Fichier a analyser: " + filePath)
           }
 				}
 				
@@ -106,7 +106,7 @@ object GUI extends SimpleSwingApplication {
 		    var widthDirectoryText : Int = peer.getFontMetrics(directoryAndFileText.font).stringWidth(directoryAndFileText.text.split("<br>").head) - widthHtml
 		    var widthFileText : Int = peer.getFontMetrics(directoryAndFileText.font).stringWidth(directoryAndFileText.text.split("<br>").last) - widthHtml
 		    var widthResultText : Int = peer.getFontMetrics(resultText.font).stringWidth(resultText.text)
-		    if(widthResultText + 50 >= width || widthResultText <= width - 50 || widthFileText + 50 >= width || widthFileText <= width - 50 || widthDirectoryText + 50 >= width || widthDirectoryText <= width - 50)                    //Vérifie que les noms ne soient pas plus grand que la fenêtre
+		    if(widthResultText + 50 >= width || widthResultText <= width - 50 || widthFileText + 50 >= width || widthFileText <= width - 50 || widthDirectoryText + 50 >= width || widthDirectoryText <= width - 50)                    //Vï¿½rifie que les noms ne soient pas plus grand que la fenï¿½tre
 		      RefreshWidth(widthResultText)
   		}
   	}
@@ -147,7 +147,7 @@ object GUI extends SimpleSwingApplication {
 	}
 	
 	def RefreshDirectoryAndFileText() {
-	  directoryAndFileText.text = "<html>Dossier d'analyse : " + directoryPath + "<br>" + "Fichier à analyser : " + filePath.split("/").last + "</html>"
+	  directoryAndFileText.text = "<html>Dossier d'analyse : " + directoryPath + "<br>" + "Fichier Ã  analyser : " + filePath.split("/").last + "</html>"
 	}
 	
 	def RefreshResult(result : String) {
