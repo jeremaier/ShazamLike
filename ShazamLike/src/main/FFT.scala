@@ -18,13 +18,22 @@ object FFT {
     return wav2DDirectory
   }
   
-  def FFT(file : Array[Array[Int]]) {
+  def FFT(file : Array[Array[Int]], l : Float) {
     //if(ham.length != 0)
     //  Hamming(N)
-  }
-  
-  def Hamming(N : Int) {
-    for (n <- 0 to N - 1)
-      ham :+ (0.54 - 0.46 * cos(2 * Pi * n / 50))
+    //T est le tableau du fichier .wav
+    //largeur de la fenêtre de Hamming
+    val fe=44100 //fréquence d'échantillonnge
+    val lenT:Int=T(0)(2)
+    for (i <- 1 to lenT)
+      {
+        var S=0
+        for (n <- 0 to fe)
+          {
+            S+=(T(i)(n))*Hamming(n-(l/2))*math.exp(-2j*Pi*fe*n)
+          }
+        //on rajoute |S| au carré au tableau T
+      }
+    return T
   }
 }
