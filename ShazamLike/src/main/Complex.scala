@@ -30,7 +30,7 @@ class Complex(val real : Double, val img : Double) {
     def i = new Complex(0, num)
   }
   
-  def Module(that : Complex) : Double = return sqrt(that.real * that.real + that.img * that.img)
+  def Module(that : Complex) : Double = return hypot(that.real, that.img)
 }
 
 object Complex {
