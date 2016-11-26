@@ -90,7 +90,7 @@ object GUI extends SimpleSwingApplication {
 		    case ButtonClicked(component)	if component == startButton => {               //Lance l'analyse du fichier
 		      resultText.text = "Analyse en cours..."
 		      var wav2D : Array[Array[Int]] = Import.WavAnalysis(filePath)
-		      FFT.FileFFT(wav2D)
+		      FFT.FileFFT(wav2D(1), wav2D(0)(2), false)
           println("Frequence d'echantillonage : " + wav2D(0)(0))
           println("Canaux : " + wav2D(0)(1))
           println("Echantillon : " + wav2D(0)(2))

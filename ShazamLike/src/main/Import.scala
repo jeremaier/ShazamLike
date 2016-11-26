@@ -20,6 +20,6 @@ object Import {
     for(i <- 0 to directoryFilesName.length)
       filesAnalysis :+ WavAnalysis(directoryPath + directoryFilesName(i))
     
-    FFT.DirectoryFilesFFT(filesAnalysis)
+    FFT.DirectoryFilesFFT(filesAnalysis(1), filesAnalysis(0)(2))
   }
 }
