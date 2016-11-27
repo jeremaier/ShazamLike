@@ -83,7 +83,7 @@ object GUI extends SimpleSwingApplication {
               resultText.text = "Attente du demarrage de l'analyse"
               startButton.text = "Lancer l'analyse"
               startButton.enabled = true
-              println("Fichier a analyser: " + filePath)
+              println("Fichier р analyser: " + filePath)
           }
 				}
 				
@@ -131,12 +131,9 @@ object GUI extends SimpleSwingApplication {
 	
 	def IsDirectoryFilesAndWav(files : Array[String], message : String, peer : java.awt.Component) :Boolean = {
 	  if(IsDirectoryFiles()) {
-      var directoryFilesIsWav : Boolean = true
-  
-      for(i <- 0 to files.length)                                          //Verifie que tous les fichiers sont en .wav
-        if(!files(i).toString().endsWith(".wav"))
-          directoryFilesIsWav = false
-  	  return directoryFilesIsWav
+      for(i <- 0 to files.length - 1)                 //Verifie que tous les fichiers sont en .wav
+        if(!files(i).toString().endsWith(".wav")) return false
+  	  return true
 	  } else return false
 	}
 	
@@ -147,7 +144,7 @@ object GUI extends SimpleSwingApplication {
 	}
 	
 	def RefreshDirectoryAndFileText() {
-	  directoryAndFileText.text = "<html>Dossier d'analyse : " + directoryPath + "<br>" + "Fichier ├а analyser : " + filePath.split("/").last + "</html>"
+	  directoryAndFileText.text = "<html>Dossier d'analyse : " + directoryPath + "<br>" + "Fichier ра analyser : " + filePath.split("/").last + "</html>"
 	}
 	
 	def RefreshResult(result : String) {
