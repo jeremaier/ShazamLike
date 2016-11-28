@@ -3,17 +3,19 @@ package main
 import scala.math._
 import Array._
 import Complex._
+import Import._
 
 object FFT {
   var filesDirectory : Array[Array[Complex]] = Array()
   
-  def FileFFT(wav2D : Array[Int], n : Int, directory : Boolean) {
-    if(directory == true)
-      filesDirectory :+ FFTAnalysis(ConvertSignalToComplex(wav2D, n), n)
-    else {
+  def FileFFT(wav2D : Array[Int], n : Int, directory : Boolean) : Array[Complex] = {
+    if(directory == true) {
+      for(i <- 0 to filesAnalysis.length)
+        filesDirectory :+ FFTAnalysis(ConvertSignalToComplex(wav2D, n), n)
+      return filesDirectory
+    } else {
       wav2D :+ Array.fill[Complex](ArrayLength(wav2D.length))(Complex(0, 0))
-      var fft = FFTAnalysis(ConvertSignalToComplex(wav2D, n), n)
-      print("FFT fichier : " + fft)      ///////////////////////
+      return FFTAnalysis(ConvertSignalToComplex(wav2D, n), n)
     }
   }
   
