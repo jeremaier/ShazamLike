@@ -8,28 +8,16 @@ import Import._
 object FFT {
   var filesDirectory : Array[Array[Complex]] = Array()
   
-  def FileFFT(wav2D : Array[Int], n : Int, directory : Boolean) : Array[Complex] = {
-    if(directory == true) {
-      for(i <- 0 to filesAnalysis.length)
-        filesDirectory :+ FFTAnalysis(ConvertSignalToComplex(wav2D, n), n)
-      return filesDirectory
-    } else {
-      wav2D :+ Array.fill[Complex](ArrayLength(wav2D.length))(Complex(0, 0))
-      return FFTAnalysis(ConvertSignalToComplex(wav2D, n), n)
-    }
+  def FillFile(wav2D : Array[Array[Int]], n : Int) : Array[Complex] = {
+    wav2D :+ fill[Complex](ArrayLength(wav2D(1).length))(Complex(0, 0))
+    return FFTAnalysis(ConvertSignalToComplex(wav2D(1), n), n)
   }
   
-  def ConvertSignalToComplex(wav2D : Array[Int], n : Int) : Array[Complex] = {
+  def ConvertSignalToComplex(wav2D : Array[Int], N : Int) : Array[Complex] = {
     var wav2DComplex : Array[Complex] = Array()
-    for(i <- 0 to n)
+    for(i <- 0 to N)
       wav2DComplex :+ ConvertToComplex(wav2D(i))
     return wav2DComplex
-  }
-  
-  def DirectoryFilesFFT(wav2DDirectory : Array[Int], n : Int) {
-    wav2DDirectory :+ Array.fill[Complex](ArrayLength(wav2DDirectory.length))(Complex(0, 0))
-    FileFFT(wav2DDirectory, n, true)
-    print(filesDirectory)                /////////////////////////
   }
   
   def ArrayLength(length : Int) : Int = {
@@ -66,5 +54,12 @@ object FFT {
         fft(k + N / 2) = fftEven(k) + -(wk * fftOdd(k))
     }
     return fft
+  }
+  
+  def ModuleFFT(fft : Array[Complex], N : Int) : Array[Double] = {
+    var module : Array[Double] = new Array(N)
+    for (i <- 0 to N)
+      module(i) = fft(i).Module()
+    return module
   }
 }

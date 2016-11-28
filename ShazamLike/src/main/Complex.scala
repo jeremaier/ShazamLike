@@ -17,14 +17,7 @@ class Complex(val real : Double, val img : Double) {
     return new Complex(realPart, imgPart)
   }
   
-  def /(that : Complex) : Complex = {
-    val numer = this * ~that
-    val denom = that * ~that
-    val divisor = denom.real
-    return new Complex(numer.real / divisor, numer.img / divisor)
-  }
-  
-  def Module(that : Complex) : Double = return hypot(that.real, that.img)
+  def Module() : Double = return hypot(this.real, this.img)
 }
 
 object Complex {

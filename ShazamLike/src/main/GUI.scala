@@ -9,6 +9,8 @@ import java.io._
 import java.awt.Font
 import java.awt.FontMetrics
 import java.awt.Graphics
+import FFT._
+import Import._
 
 object GUI extends SimpleSwingApplication {
   var time : Long = 0
@@ -22,7 +24,7 @@ object GUI extends SimpleSwingApplication {
 	var directoryPath : String = System.getProperty("user.dir") + "\\BDD"
 	var cacheFile : File = new File("cache.txt")
 	if(!cacheFile.exists()) cacheFile.createNewFile()
-	var directoryFilesName : Array[String] = Import.DirectoryFilesList(directoryPath)
+	var directoryFilesName : Array[String] = DirectoryFilesList(directoryPath)
   val startButton : Button =	new Button {                                              //Bouton pour lancer l'analyse
 		text	=	"Choisissez un fichier .wav a analyser"
 		enabled = false
@@ -34,7 +36,7 @@ object GUI extends SimpleSwingApplication {
   	val browseDirectoryButton : Button =	new Button	{text	=	"Changer de dossier..."}
     
     if(IsDirectoryFilesAndWav(directoryFilesName, "Aucun fichier dans le dossier par defaut", peer) && !IsModif(new File(directoryPath)))
-      Import.DirectoryFilesAnalysis(directoryFilesName, directoryPath)                    //Lancement de l'analyse BDD
+      DirectoryFilesAnalysis(directoryFilesName, directoryPath)                    //Lancement de l'analyse BDD
     else JOptionPane.showMessageDialog(peer, "Attention, le dossier par defaut est vide ou ne contient pas que des fichiers .wav", "Erreur", JOptionPane.ERROR_MESSAGE)
     
   	menuBar = new MenuBar {                                                               //Barre d'options
@@ -47,10 +49,10 @@ object GUI extends SimpleSwingApplication {
           if(directoryBrowser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {      //Ouverture du selecteur de dossier avec v�rification que l'user appuie sur ok
             var directory : File = directoryBrowser.getSelectedFile()
             directoryPath = directory.getAbsolutePath()
-            directoryFilesName = Import.DirectoryFilesList(directoryPath)
-
+            directoryFilesName = DirectoryFilesList(directoryPath)
+            DirectoryAnalysisLaunch(directoryFilesName, Message : String, directory)
             if(IsDirectoryFilesAndWav(directoryFilesName, "Aucun fichier dans ce dossier", peer) && !IsModif(directory))
-              Import.DirectoryFilesAnalysis(directoryFilesName, directoryPath)                //Lancement de l'analyse BDD
+              DirectoryFilesAnalysis(directoryFilesName, directoryPath)                //Lancement de l'analyse BDD
             else JOptionPane.showMessageDialog(peer, "Veuillez selectionner un dossier non vide ne contenant que des fichiers .wav", "Erreur", JOptionPane.ERROR_MESSAGE)
           }
   	    })
@@ -96,12 +98,12 @@ object GUI extends SimpleSwingApplication {
 		    case ButtonClicked(component)	if component == startButton => {               //Lance l'analyse du fichier
 		      time = System.currentTimeMillis()
 		      resultLabel.text = "Analyse en cours..."
-		      var wav2D : Array[Array[Int]] = Import.WavAnalysis(filePath)
-		      var fft = FFT.FileFFT(wav2D(1), wav2D(0)(2), false)
-		      print("FFT : " + fft)            ////////////////////////////////////////////////////////////////////////////
+		      var wav2D : Array[Array[Int]] = WavAnalysis(filePath)
+		      var longueurWav = wav2D(0)(2)
+		      print("FFT : " + ModuleFFT(FillFile(wav2D, longueurWav), longueurWav))            ////////////////////////////////////////////////////////////////////////////
           println("Frequence d'echantillonage : " + wav2D(0)(0))
           println("Canaux : " + wav2D(0)(1))
-          println("Echantillon : " + wav2D(0)(2))
+          println("Echantillon : " + longueurWav)
 		      startButton.text =	"Analyse..."
 		      startButton.enabled = false
 		    }
@@ -136,6 +138,12 @@ object GUI extends SimpleSwingApplication {
     peer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     pack()
     visible = true
+    
+    def DirectoryAnalysisLaunch(directory : String, Message : String, directoryPath : String) : Array[Array[Int]] = {
+  	  if(IsDirectoryFilesAndWav(directoryFilesName, "Aucun fichier dans le dossier par defaut", peer) && !IsModif(new File(directoryPath)))
+        DirectoryFilesAnalysis(directoryFilesName, directoryPath)
+      else JOptionPane.showMessageDialog(peer, "Attention, le dossier par defaut est vide ou ne contient pas que des fichiers .wav", "Erreur", JOptionPane.ERROR_MESSAGE)
+    }
 	}
 	
 	def IsDirectoryFilesAndWav(files : Array[String], message : String, peer : java.awt.Component) :Boolean = {
