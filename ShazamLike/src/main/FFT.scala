@@ -5,9 +5,7 @@ import Array._
 import Complex._
 import Import._
 
-object FFT {
-  var filesDirectory : Array[Array[Complex]] = Array()
-  
+object FFT {  
   def FillFile(wav2D : Array[Array[Int]], n : Int) : Array[Complex] = {
     wav2D :+ fill[Complex](ArrayLength(wav2D(1).length))(Complex(0, 0))
     return FFTAnalysis(ConvertSignalToComplex(wav2D(1), n), n)
