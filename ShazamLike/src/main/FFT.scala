@@ -7,16 +7,17 @@ import Import._
 
 object FFT {  
   def FillFile(wav2D : Array[Int], n : Int) : Array[Complex] = {
-    var wav : Array[Int] = wav2D
-    //wav :+= fill[Int](ArrayLength(wav2D.length))(0)
-    return FFTAnalysis(ConvertSignalToComplex(wav, n), n)
+    var wav : Array[Complex] = ConvertSignalToComplex(wav2D, n)
+    var sup2 = ArrayLength(wav.length)
+    wav ++= Array.fill[Complex](sup2 - n)(Complex(0, 0))
+    return FFTAnalysis(wav, sup2)
   }
   
   def ConvertSignalToComplex(wav2D : Array[Int], N : Int) : Array[Complex] = {
     var wavComplex : Array[Complex] = Array()
     var i : Int = 0
     while (i < N) {
-      wavComplex +:= ConvertToComplex(wav2D(i))
+      wavComplex :+= ConvertToComplex(wav2D(i))
       i += 1
     }
     return wavComplex
@@ -32,18 +33,17 @@ object FFT {
   def ArrayLength(length : Int) : Int = {
     var N : Int = length
     var n : Int = N
-    if((n & (N - 1)) != 0) {
+    if((n & (N - 1)) != 0)
       do {
         N = n
         n &= (n - 1)
       } while(n != 0)
-    }
     return N - n << 1
   }
   
   def FFTAnalysis(file : Array[Complex], N : Int) : Array[Complex] = {
     if (N == 1) return file
-    if (N % 2 != 0) throw new RuntimeException("Problème de longueur pas puissance de 2!!! -> à corriger")
+    if (N % 2 != 0) throw new RuntimeException("Problème de longueur pas puissance de 2!")
     
     var even : Array[Complex] = new Array(N / 2)
     for (k <- 0 to N / 2 by 2)

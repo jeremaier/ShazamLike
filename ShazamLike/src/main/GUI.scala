@@ -37,8 +37,6 @@ object GUI extends SimpleSwingApplication {
   	val browseFileButton : Button =	new Button	{text	=	"Parcourir..."}
   	val browseDirectoryButton : Button =	new Button	{text	=	"Changer de dossier..."}
     
-    DirectoryAnalysisLaunch(peer)
-    
   	menuBar = new MenuBar {                                                               //Barre d'options
   	  contents += new Menu("Options") {                                                   //Ajout d'un menu deroulant
   	    contents += new MenuItem(swing.Action("Changer de dossier...") {
@@ -135,6 +133,8 @@ object GUI extends SimpleSwingApplication {
     peer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     pack()
     visible = true
+    
+    DirectoryAnalysisLaunch(peer)
 	}
 	
 	def DirectoryAnalysisLaunch(peer : java.awt.Component) {
