@@ -6,16 +6,27 @@ import Complex._
 import Import._
 
 object FFT {  
-  def FillFile(wav2D : Array[Array[Int]], n : Int) : Array[Complex] = {
-    wav2D :+ fill[Complex](ArrayLength(wav2D(1).length))(Complex(0, 0))
-    return FFTAnalysis(ConvertSignalToComplex(wav2D(1), n), n)
+  def FillFile(wav2D : Array[Int], n : Int) : Array[Complex] = {
+    var wav : Array[Int] = wav2D
+    //wav :+= fill[Int](ArrayLength(wav2D.length))(0)
+    return FFTAnalysis(ConvertSignalToComplex(wav, n), n)
   }
   
   def ConvertSignalToComplex(wav2D : Array[Int], N : Int) : Array[Complex] = {
-    var wav2DComplex : Array[Complex] = Array()
-    for(i <- 0 to N)
-      wav2DComplex :+ ConvertToComplex(wav2D(i))
-    return wav2DComplex
+    var wavComplex : Array[Complex] = Array()
+    var i : Int = 0
+    while (i < N) {
+      wavComplex +:= ConvertToComplex(wav2D(i))
+      i += 1
+    }
+    return wavComplex
+    
+    /*
+     * ////////////////Voulu faire une fonction recursive... -> StackOverFlow
+    if(N == 0)
+      return Array[Complex](ConvertToComplex(wav2D(0)))
+    else return ConvertToComplex(wav2D.head) +: ConvertSignalToComplex(wav2D.tail, N - 1)
+    */
   }
   
   def ArrayLength(length : Int) : Int = {

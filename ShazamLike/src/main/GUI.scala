@@ -38,7 +38,6 @@ object GUI extends SimpleSwingApplication {
   	val browseDirectoryButton : Button =	new Button	{text	=	"Changer de dossier..."}
     
     DirectoryAnalysisLaunch(peer)
-    println(filesDirectory)              ////////////////////////
     
   	menuBar = new MenuBar {                                                               //Barre d'options
   	  contents += new Menu("Options") {                                                   //Ajout d'un menu deroulant
@@ -52,7 +51,6 @@ object GUI extends SimpleSwingApplication {
             directoryPath = directory.getAbsolutePath()
             directoryFilesName = DirectoryFilesList(directoryPath)
             DirectoryAnalysisLaunch(peer)
-            println(filesDirectory)              ////////////////////////
           }
   	    })
   	    
@@ -99,7 +97,7 @@ object GUI extends SimpleSwingApplication {
 		      resultLabel.text = "Analyse en cours..."
 		      var wav2D : Array[Array[Int]] = WavAnalysis(filePath)
 		      var longueurWav = wav2D(0)(2)
-		      println("FFT : " + ModuleFFT(FillFile(wav2D, longueurWav), longueurWav))            ////////////////////////////////////////////////////////////////////////////
+		      println("FFT : " + ModuleFFT(FillFile(wav2D(1), longueurWav), longueurWav))
           println("Frequence d'echantillonage : " + wav2D(0)(0))
           println("Canaux : " + wav2D(0)(1))
           println("Echantillon : " + longueurWav)
@@ -140,11 +138,11 @@ object GUI extends SimpleSwingApplication {
 	}
 	
 	def DirectoryAnalysisLaunch(peer : java.awt.Component) {
-	  if(!IsModif(new File(directoryPath))) {
+	  if(IsModif(new File(directoryPath))) {
   	  if(IsDirectoryFilesAndWav(directoryFilesName, peer))
         return DirectoryFilesAnalysis(directoryFilesName, directoryPath)
       else errorMessageWindow(peer, errorMessage)
-	  } else errorMessageWindow(peer, "Le dossier sélectionné est le même que précédemment")
+	  } else errorMessageWindow(peer, "Le dossier sélectionné est le même que pour la dernière utilisation")
   }
 	
 	def errorMessageWindow(peer : java.awt.Component, message : String) {JOptionPane.showMessageDialog(peer, message, "Erreur", JOptionPane.ERROR_MESSAGE)}
@@ -165,6 +163,7 @@ object GUI extends SimpleSwingApplication {
 	}
 	
 	def IsModif(directory : File) : Boolean = {
+	  /*
 	  var date = directory.lastModified().toString()
 	  var cacheFileReader : String = new BufferedReader(new FileReader(cacheFile)).readLine()
 	  if(date != cacheFileReader) {
@@ -173,6 +172,8 @@ object GUI extends SimpleSwingApplication {
       cacheFileWriter.close()
       return true
 	  } else return false
+	  */
+	  return true
 	}
 	
 	def IsDirectoryFiles() : Boolean = {
