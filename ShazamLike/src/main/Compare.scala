@@ -42,6 +42,22 @@ def empreinte(T:Array[Array[Float]]):(Array[Array[Float]])=
   
 }
 
+def maxF(T:Array[Float]):Float={
+  var max : Float = 0
+  for (i<- 0 to range T.length-1){
+    if (T(i)>max) {
+      max = T(i)
+    }
+  }
+  return max
+}
+def moyenne(T:Array[Float]):Float={
+  var s : Float= 0
+  for (i<- 0 to T.length-1) {
+    s = s + T(i)
+  }
+  return s/T.length.length
+}
 
 
 
