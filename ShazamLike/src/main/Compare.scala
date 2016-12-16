@@ -27,7 +27,7 @@ def empreinte(T:Array[Array[Float]]):(Array[Array[Float]])=
     Tabmax:+=maxA(TabBande) //pour chaque bande de fréquence on garde le max d'amplitude
   }
   var moy=moyenneA(Tabmax)
-  Tabmax=supMoyA(Tabmax)//on garde seulement les amplitudes supérieures à la moyenne
+  Tabmax=supMoyA(Tabmax,moy)//on garde seulement les amplitudes supérieures à la moyenne
   return Tabmax
   }
   
@@ -59,7 +59,18 @@ def moyenneA(T:Array[Array[Float]]):Float={
   return s/T.length
 }
 
-
+def supMoyA(T:Array[Array[Float]],moy:Float):Array[Array[Float]]={
+  //fonction qui garde les tableaux contenant des amplitudes supérieures à moy
+  var TabSup:Array[Array[Float]]=Array(Array())
+  for (i<- 0 to T.length-1)
+  {
+    if (T(i)(0)>moy)
+    {
+      TabSup+:=T(i)
+    }
+  }
+  return TabSup
+}
 
 
 
