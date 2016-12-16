@@ -10,21 +10,21 @@ def empreinte(T:Array[Array[Float]]):(Array[Array[Float]])=
   //on suppose que le tableau est de la forme T=[[A,f,t],[ ], ...]
   //il faut que le tableau d'amplitudes soit trié en fonction du temps
   //on réorganise les amplitudes en fonction des fréquences (croissantes) (c'est ce qui sort de la fft)
-  var TabBande:Array[Array[Float]]=Array(Array())
   var Tabmax:Array[Array[Float]]=Array(Array())
-  for (palier<-Array(10,20,40,80,160,511))
-  {
-    //on crée les différentes bandes de fréquence
-    //pour chaque bande de fréquence on ajoute les élements au tableau TabBande et on calcule le max et la moyenne
-    //on calcule la moyenne de chaque bande de fréquence
-    var compteur=0
-    var TabBande:Array[Array[Float]]=Array(Array())
-    while (math.log10(T(compteur)(1))<palier)
-    {
-      TabBande+:=T(compteur)
-      compteur+=1
-    }
+  var bandes:Array[Int]=Array(0,10,20,40,80,160,T.length-1)
+  for (i<-0 to bandes.length-2)
+  { 
+    var TabBande:Array[Array[Float]]=selection(T,bandes(i),bandes(i+1)) //on sélectionne les différentes bandes de fréquence
     Tabmax+:=maxA(TabBande) //pour chaque bande de fréquence on garde le max d'amplitude
+    
+    //var compteur=0
+    //while (math.log10(T(compteur)(1))<palier)
+    //{
+      //TabBande+:=T(compteur)
+      //compteur+=1
+    //}
+    
+
   }
   var moy=moyenneA(Tabmax)
   Tabmax=supMoyA(Tabmax,moy)//on garde seulement les amplitudes supérieures à la moyenne
@@ -37,6 +37,19 @@ def empreinte(T:Array[Array[Float]]):(Array[Array[Float]])=
   //on garde seulement les points qui sont au dessus de la moyenne
   //on obtient notre empreinte
   
+
+def selection(T:Array[Array[Float]],début:Int,n:Int):Array[Array[Float]]=
+  {
+  //fonction qui sélectionne, à partir d'un tableau T, n sous tableaux à partir de l'indice début
+  var selec:Array[Array[Float]]=Array(Array())
+  for (i<- début to n-début)
+    {
+    selec+:=T(i)
+    }
+  return selec
+  }
+
+
 
 def maxA(T:Array[Array[Float]]):Array[Float]={
   //fonction qui calcule l'élement ayant l'amplitude la plus haute 
@@ -53,7 +66,7 @@ def maxA(T:Array[Array[Float]]):Array[Float]={
   return TabMax
 }
 def moyenneA(T:Array[Array[Float]]):Float={
-  //fonction qui calcule l'élement ayant la fréquence la plus haute 
+  //fonction qui calcule la moyenne de fréquence des éléments de T
   //T est de la forme [[A,f,t],[A,f,t]]
   var s : Float= 0
   for (i<- 0 to T.length-1) {
