@@ -10,27 +10,24 @@ def empreinte(T:Array[Array[Float]]):(Array[Array[Float]])=
   //on suppose que le tableau est de la forme T=[[A,f,t],[ ], ...]
   //il faut que le tableau d'amplitudes soit trié en fonction du temps
   //on réorganise les amplitudes en fonction des fréquences (croissantes) (c'est ce qui sort de la fft)
-  var TabBande=Array[Array[Float]]
-  var Tabmax=Array.emptyFloatArray
+  var TabBande:Array[Array[Float]]=Array(Array())
+  var Tabmax:Array[Array[Float]]=Array(Array())
   for (palier<-Array(10,20,40,80,160,511))
   {
+    //on crée les différentes bandes de fréquence
+    //pour chaque bande de fréquence on ajoute les élements au tableau TabBande et on calcule le max et la moyenne
+    //on calcule la moyenne de chaque bande de fréquence
     var compteur=0
-    var TabBande=Array.emptyObjectArray
+    var TabBande:Array[Array[Float]]=Array(Array())
     while (math.log10(T(compteur)(1))<palier)
     {
-      TabBande+:=T(i)
+      TabBande+:=T(compteur)
       compteur+=1
     }
-    Tabmax+:=maxF(TabBande) //créer la fonction maxF d'un tableau
+    Tabmax:+=maxA(TabBande) //pour chaque bande de fréquence on garde le max d'amplitude
   }
-  var moy=moyenne(Tabmax) //creer la fonction moyenne d'un tableau
-  for (i<-0 to Tabmax.length-1)
-  {
-    if (Tabmax(i)(0)<moy) //on fait la moyenne des amplitudes
-    {
-      Tabmax-=Tabmax(i)
-    }
-  }
+  var moy=moyenneA(Tabmax)
+  Tabmax=supMoyA(Tabmax)//on garde seulement les amplitudes supérieures à la moyenne
   return Tabmax
   }
   
@@ -40,24 +37,30 @@ def empreinte(T:Array[Array[Float]]):(Array[Array[Float]])=
   //on garde seulement les points qui sont au dessus de la moyenne
   //on obtient notre empreinte
   
-}
 
-def maxF(T:Array[Float]):Float={
+def maxA(T:Array[Array[Float]]):Float={
+  //fonction qui calcule l'élement ayant l'amplitude la plus haute 
+  //T est de la forme [[A,f,t],[A,f,t]]
   var max : Float = 0
-  for (i<- 0 to range T.length-1){
-    if (T(i)>max) {
-      max = T(i)
+  for (i<- 0 to T.length-1){
+    if (T(i)(0)>max) {
+      max = T(i)(0)
     }
   }
   return max
 }
-def moyenne(T:Array[Float]):Float={
+def moyenneA(T:Array[Array[Float]]):Float={
+  //fonction qui calcule l'élement ayant la fréquence la plus haute 
+  //T est de la forme [[A,f,t],[A,f,t]]
   var s : Float= 0
   for (i<- 0 to T.length-1) {
-    s = s + T(i)
+    s = s+T(i)(0)
   }
-  return s/T.length.length
+  return s/T.length
 }
+
+
+
 
 
 
