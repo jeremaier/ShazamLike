@@ -24,7 +24,7 @@ def empreinte(T:Array[Array[Float]]):(Array[Array[Float]])=
       TabBande+:=T(compteur)
       compteur+=1
     }
-    Tabmax:+=maxA(TabBande) //pour chaque bande de fréquence on garde le max d'amplitude
+    Tabmax+:=maxA(TabBande) //pour chaque bande de fréquence on garde le max d'amplitude
   }
   var moy=moyenneA(Tabmax)
   Tabmax=supMoyA(Tabmax,moy)//on garde seulement les amplitudes supérieures à la moyenne
@@ -38,16 +38,19 @@ def empreinte(T:Array[Array[Float]]):(Array[Array[Float]])=
   //on obtient notre empreinte
   
 
-def maxA(T:Array[Array[Float]]):Float={
+def maxA(T:Array[Array[Float]]):Array[Float]={
   //fonction qui calcule l'élement ayant l'amplitude la plus haute 
+  //et qui renvoie cet élement qui est un tableau
   //T est de la forme [[A,f,t],[A,f,t]]
-  var max : Float = 0
+  var TabMax:Array[Float]=Array()
+  var max : Float = T(0)(0) 
   for (i<- 0 to T.length-1){
     if (T(i)(0)>max) {
-      max = T(i)(0)
+      TabMax = T(i)
+      max=T(i)(0)
     }
   }
-  return max
+  return TabMax
 }
 def moyenneA(T:Array[Array[Float]]):Float={
   //fonction qui calcule l'élement ayant la fréquence la plus haute 
