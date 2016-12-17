@@ -6,6 +6,7 @@ import Complex._
 import Import._
 
 object FFT {  
+  //Appelle la fonction FFT avec comme argument les parties du fichier de la bonne longueur (en puissance de 2)
   def FillFile(wav2D : Array[Int], n : Int) : Array[Complex] = {
     var wav : Array[Complex] = ConvertSignalToComplex(wav2D, n)
     var sup2 = ArrayLength(wav.length)
@@ -13,6 +14,7 @@ object FFT {
     return FFTAnalysis(wav, sup2)
   }
   
+  //Converti chaque nombre du tableau des amplitudes du fichier en complexe
   def ConvertSignalToComplex(wav2D : Array[Int], N : Int) : Array[Complex] = {
     var wavComplex : Array[Complex] = Array()
     var i : Int = 0
@@ -22,14 +24,18 @@ object FFT {
     }
     return wavComplex
     
-    /*
-     * ////////////////Voulu faire une fonction recursive... -> StackOverFlow
-    if(N == 0)
-      return Array[Complex](ConvertToComplex(wav2D(0)))
-    else return ConvertToComplex(wav2D.head) +: ConvertSignalToComplex(wav2D.tail, N - 1)
+    //Evaluer la difference de temps entre les 2 methodes
+    /*def ConvertRecur(wav2D : Array[Int], N : Int, acc : Array[Complex]) : Array[Complex] = {
+      if(N <= 0)
+        return acc :+ ConvertToComplex(wav2D.head)
+      else return ConvertRecur(wav2D.tail, N - 1, acc :+ ConvertToComplex(wav2D.head))
+    }
+    ConvertRecur(wav2D, N, Array.empty)
     */
   }
   
+  //Comparaison binaire pour avoir la difference entre la longueur du fichier et la puissance de 2 superieure
+  //Sert à remplir de 0 le tableau d'amplitude du fichier et l'avoir d'une longueur puissance de 2 pour utiliser l'algorithme de Cooley-Tuckey
   def ArrayLength(length : Int) : Int = {
     var N : Int = length
     var n : Int = N
@@ -41,30 +47,34 @@ object FFT {
     return N - n << 1
   }
   
+  //FFT de la liste en argument, ressort une liste de frequences modulé
   def FFTAnalysis(file : Array[Complex], N : Int) : Array[Complex] = {
     if (N == 1) return file
-    if (N % 2 != 0) throw new RuntimeException("Problème de longueur pas puissance de 2!")
+    if (N % 2 != 0) throw new RuntimeException("Problème de longueur, pas puissance de 2!")
     
+    //Premiere liste de nombre d'indice pair
     var even : Array[Complex] = new Array(N / 2)
-    for (k <- 0 to N / 2 by 2)
-        even(k) = file(k)
+    for (k <- 0 to N / 2 - 1 by 2)
+      even(k) = file(k)
     var fftEven : Array[Complex] = FFTAnalysis(even, N / 2)
     
+    //Deuxieme liste du nombre d'indice impair
     var odd : Array[Complex] = even
-    for (k <- 0 to N / 2 by 2)
-        odd(k) = file(k + 1)
+    for (k <- 0 to N / 2 - 1 by 2)
+      odd(k) = file(k + 1)
     var fftOdd : Array[Complex] = FFTAnalysis(odd, N / 2)
     
     var fft : Array[Complex] = new Array(N)
     for (k <- 0 to N / 2) {
-        var kth : Double = - 2 * k * Pi / N
-        var wk = new Complex(Math.cos(kth), Math.sin(kth))
-        fft(k) = fftEven(k) + (wk * fftOdd(k))
-        fft(k + N / 2) = fftEven(k) + -(wk * fftOdd(k))
+      var kth : Double = - 2 * k * Pi / N
+      var wk = new Complex(Math.cos(kth), Math.sin(kth))
+      fft(k) = fftEven(k) + (wk * fftOdd(k))
+      fft(k + N / 2) = fftEven(k) + -(wk * fftOdd(k))
     }
     return fft
   }
   
+  //Module de chaque element de la fft
   def ModuleFFT(fft : Array[Complex], N : Int) : Array[Double] = {
     var module : Array[Double] = new Array(N)
     for (i <- 0 to N)

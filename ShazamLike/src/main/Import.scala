@@ -10,11 +10,15 @@ object Import {
   var filesAmplitude : Array[Array[Int]] = Array()
   var filesDirectory : Array[Array[Double]] = Array()
   
-  def WavAnalysis(file : String) : Array[Array[Int]] = {return new WavWrapper(file).getWav()} //Renvoi le son en une liste de liste de nombre
+  //Renvoi le son en une liste de liste de nombres representant les amplitudes en fonction du temps
+  def WavAnalysis(file : String) : Array[Array[Int]] = return new WavWrapper(file).getWav()
   
-  def DirectoryFilesList(directoryPath : String) : Array[String] = {return Utils.listFiles(directoryPath)}   //Renvoi la liste des fichiers contenu dans la BDD
+  //Renvoi la liste des noms des fichiers contenu dans la BDD
+  def DirectoryFilesList(directoryPath : String) : Array[String] = return Utils.listFiles(directoryPath)
   
-  def DirectoryFilesAnalysis(directoryFilesName : Array[String], directoryPath : String) {                   //Enregistre dans une liste l'ensemble des sons sous forme de listes de nombres contenus dans la BDD
+  //Enregistre dans 2 listes differentes les parametres de chaque son et les listes des amplitudes
+  //Puis lancement des FFT
+  def DirectoryFilesAnalysis(directoryFilesName : Array[String], directoryPath : String) {
     println("Dossier BDD : " + directoryPath)
     
     for(i <- 0 to directoryFilesName.length - 1) {
