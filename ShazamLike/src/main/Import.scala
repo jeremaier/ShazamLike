@@ -6,10 +6,6 @@ import Array._
 import FFT._
 
 object Import {
-  var filesParameters : Array[Array[Int]] = Array()
-  var filesAmplitude : Array[Array[Int]] = Array()
-  var filesDirectory : Array[Array[Double]] = Array()
-  
   //Renvoi le son en une liste de liste de nombres representant les amplitudes en fonction du temps
   def WavAnalysis(file : String) : Array[Array[Int]] = return new WavWrapper(file).getWav()
   
@@ -21,14 +17,40 @@ object Import {
   def DirectoryFilesAnalysis(directoryFilesName : Array[String], directoryPath : String) {
     println("Dossier BDD : " + directoryPath)
     
-    for(i <- 0 to directoryFilesName.length - 1) {
-      filesParameters :+= WavAnalysis(directoryPath + "\\" + directoryFilesName(i))(0)
-      filesAmplitude :+= WavAnalysis(directoryPath + "\\" + directoryFilesName(i))(1)
-    }
+    var filesNumber = directoryFilesName.length
+    var filesParameters : Array[Array[Int]] = new Array(filesNumber)
+    var filesAmplitude : Array[Array[Float]] = new Array(filesNumber)
+    var filesDirectory : Array[Array[Double]] = new Array(filesNumber)
     
-    for(i <- 0 to filesAmplitude.length - 1) {
+    for(i <- 0 to filesNumber - 1) {
+      var analysis = WavAnalysis(directoryPath + "\\" + directoryFilesName(i))
+      filesParameters(i) = analysis(0)
       var N : Int = filesParameters(i)(2)
-      filesDirectory :+= ModuleFFT(FillFile(filesAmplitude(i), N), N)
+      
+      if(analysis.length == 3)
+        filesAmplitude(i) = StereoToMono(analysis(1), analysis(2), N)
+      else filesAmplitude(i) = IntToFloat(analysis(1), N)
+      
+      filesDirectory(i) = ModuleFFT(FillFile(filesAmplitude(i), N), N)
     }
+  }
+  
+  //Transforme une array de Int en array de Double
+  def IntToFloat(ints : Array[Int], N : Int) : Array[Float] = {
+    var floatAnalysis : Array[Float] = new Array(N)
+    for(i <- 0 to N - 1)
+      floatAnalysis(i) = ints(i).toFloat
+    return floatAnalysis
+  }
+  
+  //Passage d'un son stereo à un son mono en faisant la moyenne des 2 canaux
+  def StereoToMono(canal1 : Array[Int], canal2 : Array[Int], N : Int) : Array[Float] = {
+    var stereo : Array[Float] = new Array(N)
+    var i : Int = 0
+    while (i < N) {
+      stereo(i) = (canal1(i) + canal2(i)) / 2
+      i += 1
+    }
+    return stereo
   }
 }

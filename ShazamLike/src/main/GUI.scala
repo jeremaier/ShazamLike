@@ -99,7 +99,7 @@ object GUI extends SimpleSwingApplication {
 		      resultLabel.text = "Analyse en cours..."
 		      var wav2D : Array[Array[Int]] = WavAnalysis(filePath)
 		      var longueurWav = wav2D(0)(2)
-		      println("FFT : " + ModuleFFT(FillFile(wav2D(1), longueurWav), longueurWav))
+		      println("FFT : " + ModuleFFT(FillFile(IntToFloat(wav2D(1), longueurWav), longueurWav), longueurWav))
           println("Frequence d'echantillonage : " + wav2D(0)(0))
           println("Canaux : " + wav2D(0)(1))
           println("Echantillon : " + longueurWav)

@@ -7,7 +7,7 @@ import Import._
 
 object FFT {  
   //Appelle la fonction FFT avec comme argument les parties du fichier de la bonne longueur (en puissance de 2)
-  def FillFile(wav2D : Array[Int], n : Int) : Array[Complex] = {
+  def FillFile(wav2D : Array[Float], n : Int) : Array[Complex] = {
     var wav : Array[Complex] = ConvertSignalToComplex(wav2D, n)
     var sup2 = ArrayLength(wav.length)
     wav ++= Array.fill[Complex](sup2 - n)(Complex(0, 0))
@@ -15,7 +15,7 @@ object FFT {
   }
   
   //Converti chaque nombre du tableau des amplitudes du fichier en complexe
-  def ConvertSignalToComplex(wav2D : Array[Int], N : Int) : Array[Complex] = {
+  def ConvertSignalToComplex(wav2D : Array[Float], N : Int) : Array[Complex] = {
     var wavComplex : Array[Complex] = new Array(N)
     var i : Int = 0
     while (i < N) {
@@ -74,15 +74,5 @@ object FFT {
       i += 1
     }
     return module
-  }
-  
-  def StereoToMono(canal1 : Array[Double], canal2 : Array[Double], N : Int) : Array[Double] = {
-    var stereo : Array[Double] = new Array(N)
-    var i : Int = 0
-    while (i < N) {
-      stereo(i) = (canal1(i) + canal2(i)) / 2
-      i += 1
-    }
-    return stereo
   }
 }
