@@ -16,22 +16,13 @@ object FFT {
   
   //Converti chaque nombre du tableau des amplitudes du fichier en complexe
   def ConvertSignalToComplex(wav2D : Array[Int], N : Int) : Array[Complex] = {
-    var wavComplex : Array[Complex] = Array()
+    var wavComplex : Array[Complex] = new Array(N)
     var i : Int = 0
     while (i < N) {
-      wavComplex :+= ConvertToComplex(wav2D(i))
+      wavComplex(i) = ConvertToComplex(wav2D(i))
       i += 1
     }
     return wavComplex
-    
-    //Evaluer la difference de temps entre les 2 methodes
-    /*def ConvertRecur(wav2D : Array[Int], N : Int, acc : Array[Complex]) : Array[Complex] = {
-      if(N <= 0)
-        return acc :+ ConvertToComplex(wav2D.head)
-      else return ConvertRecur(wav2D.tail, N - 1, acc :+ ConvertToComplex(wav2D.head))
-    }
-    ConvertRecur(wav2D, N, Array.empty)
-    */
   }
   
   //Comparaison binaire pour avoir la difference entre la longueur du fichier et la puissance de 2 superieure
@@ -47,18 +38,18 @@ object FFT {
     return N - n << 1
   }
   
-  //FFT de la liste en argument, ressort une liste de frequences modulé
+  //FFT de la liste en argument, ressort une liste de frequences
   def FFTAnalysis(file : Array[Complex], N : Int) : Array[Complex] = {
     if (N == 1) return file
     if (N % 2 != 0) throw new RuntimeException("Problème de longueur, pas puissance de 2!")
     
-    //Premiere liste de nombre d'indice pair
+    //Premiere liste de nombres d'indice pair
     var even : Array[Complex] = new Array(N / 2)
     for (k <- 0 to N / 2 - 1 by 2)
       even(k) = file(k)
     var fftEven : Array[Complex] = FFTAnalysis(even, N / 2)
     
-    //Deuxieme liste du nombre d'indice impair
+    //Deuxieme liste de nombres d'indice impair
     var odd : Array[Complex] = even
     for (k <- 0 to N / 2 - 1 by 2)
       odd(k) = file(k + 1)
@@ -77,8 +68,21 @@ object FFT {
   //Module de chaque element de la fft
   def ModuleFFT(fft : Array[Complex], N : Int) : Array[Double] = {
     var module : Array[Double] = new Array(N)
-    for (i <- 0 to N)
+    var i : Int = 0
+    while(i < N) {
       module(i) = fft(i).Module()
+      i += 1
+    }
     return module
+  }
+  
+  def StereoToMono(canal1 : Array[Double], canal2 : Array[Double], N : Int) : Array[Double] = {
+    var stereo : Array[Double] = new Array(N)
+    var i : Int = 0
+    while (i < N) {
+      stereo(i) = (canal1(i) + canal2(i)) / 2
+      i += 1
+    }
+    return stereo
   }
 }
