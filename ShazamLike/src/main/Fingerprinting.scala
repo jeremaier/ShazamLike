@@ -29,10 +29,32 @@ object Fingerprinting {
   //on realise une fonction max d'un tableau sur les amplitudes de chaque bande de frequence
   //on calcule la moyenne des 6 valeurs obtenues
   //on garde seulement les points qui sont au dessus de la moyenne
-  //on obtient notre empreinte
+  //on obtient notre empreinte(constellation plutot ?)
+  
+  // creation de la target zone : on trie les points obtenus de cette maniere : 
+  // les points sont deja tries selon la frequence, on va d'abord les trier selon le temps par un tri a bulle
+  //puis si deux points ont le meme temps, alors on trie selon la frequence
+  //sinon on trie selon le temps
+  
+def triTemps(T: Array[Array[Float]]) : Boolean = {
+  for (i<-T.length -1 to 1 by -1){
+    var tableauTrie:Boolean = true
+    for (j<- 0 to i-1) {
+    if (T(2)(j+1) < T(2)(j){
+        echanger(T(2)(j+1),T(2)(j))// faire une fonction echanger
+        tableauTrie = false
+        if (tableauTrie) {
+          return false
+        }
+  }
+  }
+}
+}// on obtient un tableau trie selon le temps 
+// maintenant on parcourt ce tableau
+// et on trie si les points ont la meme frequence
     
   def selection(T : Array[Array[Float]], debut : Int, n : Int) : Array[Array[Float]] = {
-    //fonction qui selectionne, a  partir d'un tableau T, n sous tableaux a partir de l'indice debut
+    //fonction qui selectionne, aï¿½ partir d'un tableau T, n sous tableaux a partir de l'indice debut
     var selec : Array[Array[Float]] = Array(Array())
     for (i <- debut to n - debut)
       selec +:= T(i)
@@ -74,4 +96,6 @@ object Fingerprinting {
     }
     return TabSup
   }
+  
+  def echanger(
 }
