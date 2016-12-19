@@ -7,6 +7,7 @@ import FFT._
 
 object Import {
   var sampleLength : Int = 4096
+  var sampleLengthTemp : Int = sampleLength
   
   //Renvoi le son en une liste de liste de nombres representant les amplitudes en fonction du temps
   def WavAnalysis(file : String) : Array[Array[Int]] = return new WavWrapper(file).getWav()
@@ -19,7 +20,9 @@ object Import {
   def DirectoryFilesAnalysis(directoryFilesName : Array[String], directoryPath : String) {
     println("Dossier BDD : " + directoryPath)
     
-    Hamming(sampleLength)
+    if(sampleLength != sampleLengthTemp)
+      Hamming(sampleLength)
+    
     var filesNumber = directoryFilesName.length
     var filesParameters : Array[Array[Int]] = new Array(filesNumber)
     var filesAmplitude : Array[Array[Float]] = new Array(filesNumber)

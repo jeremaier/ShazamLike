@@ -71,7 +71,6 @@ object FFT {
   //FFT de la liste en argument, ressort une liste de frequences
   def FFTAnalysis(file : Array[Complex], N : Int) : Array[Complex] = {
     if (N == 1) return file
-    if (N % 2 != 0) throw new RuntimeException("Problème de longueur, pas puissance de 2!")
     
     //Premiere liste de nombres d'indice pair
     var even : Array[Complex] = new Array(N / 2)
@@ -80,21 +79,21 @@ object FFT {
     var fftEven : Array[Complex] = FFTAnalysis(even, N / 2)
     
     //Deuxieme liste de nombres d'indice impair
-    var odd : Array[Complex] = even
-    for (k <- 0 to N / 2 - 1 by 2)
-      odd(k) = file(k + 1)
+    var odd : Array[Complex] = new Array(N / 2)
+    for (k <- 1 to N / 2 - 1 by 2)
+      odd(k) = file(k)
     var fftOdd : Array[Complex] = FFTAnalysis(odd, N / 2)
     
     var fft : Array[Complex] = new Array(N)
     for (k <- 0 to N / 2) {
       var kth : Double = - 2 * k * Pi / N
-      var wk = new Complex(Math.cos(kth), Math.sin(kth))
+      var wk : Complex = new Complex(Math.cos(kth), Math.sin(kth))
       fft(k) = fftEven(k) + (wk * fftOdd(k))
       fft(k + N / 2) = fftEven(k) + -(wk * fftOdd(k))
     }
     return fft
   }
-  
+    
   //Module de chaque element de la fft
   def ModuleFFT(sample : Array[Complex], N : Int) : Array[Double] = {
     var fft : Array[Complex] = FFTAnalysis(sample, N)

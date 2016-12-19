@@ -17,7 +17,6 @@ class Complex(val real : Double, val img : Double) {
   
   //Multiplication de 2 nombres complexes
   def *(that : Complex) : Complex = {
-    println(this.real, this.img, that.real)
     val realPart = this.real * that.real + -(this.img * that.img)
     val imgPart = this.real * that.img + this.img * that.real
     new Complex(realPart, imgPart)
