@@ -34,7 +34,7 @@ object Import {
         filesAmplitude(i) = StereoToMono(analysis(1), analysis(2), N)
       else filesAmplitude(i) = IntToFloat(analysis(1), N)
       
-      filesDirectory(i) = ModuleFFT(FillFile(filesAmplitude(i), N), N)
+      filesDirectory(i) = SplitingAndFFT(filesAmplitude(i), filesParameters(i), sampleLength)
     }
   }
   
