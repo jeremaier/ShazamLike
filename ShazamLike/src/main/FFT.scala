@@ -2,16 +2,46 @@ package main
 
 import scala.math._
 import Array._
+import java.util.Arrays.copyOfRange
 import Complex._
 import Import._
 
-object FFT {  
+object FFT {
+  var hamming : Array[Double] = Array(sampleLength)
+  
+  //Decoupe le son à analyser en des samples de 4096 amplitudes et effectue la FFT sur chacune d'elle après avoir appliqué hamming pour retourner la liste de toutes ces FFT
+  def SplitingAndFFT(wav2D : Array[Float], parameters : Array[Int], sampleLength: Int) : Array[Double] = {
+    var N : Int = parameters(2)
+    var FFT : Array[Double] = Array(N)
+    val lastSample : Int = N / sampleLength
+    var lastSampleLength : Int = N % sampleLength
+    val last : Array[Complex] = FillFile(ConvertSignalToComplex(copyOfRange(wav2D, N - lastSampleLength, N - 1), lastSampleLength), sampleLength)
+
+    for(i <- 0 to lastSample - 1) {
+      var sample : Array[Complex] = new Array(N)
+      
+      for(j <- 0 to sampleLength)
+        sample(i) = ConvertToComplex(wav2D(i * j) * hamming(i))
+      
+      FFT ++= ModuleFFT(sample, sampleLength)
+    }
+    
+    FFT ++= ModuleFFT(last, sampleLength)
+    return FFT
+  }
+  
+  //Fenetre de Hamming
+  def Hamming(sampleLength : Int) {
+    for(i <- 0 to sampleLength)
+      hamming(i) = 0.54 - 0.46 * cos((2 * Pi * i) / (sampleLength - 1))
+  }
+  
   //Appelle la fonction FFT avec comme argument les parties du fichier de la bonne longueur (en puissance de 2)
-  def FillFile(wav2D : Array[Float], n : Int) : Array[Complex] = {
-    var wav : Array[Complex] = ConvertSignalToComplex(wav2D, n)
-    var sup2 = ArrayLength(wav.length)
-    wav ++= Array.fill[Complex](sup2 - n)(Complex(0, 0))
-    return FFTAnalysis(wav, sup2)
+  def FillFile(wav2D : Array[Complex], sampleLength : Int) : Array[Complex] = {
+    val wavLength = wav2D.length
+    var wav : Array[Complex] = new Array(wavLength)
+    wav ++= Array.fill[Complex](sampleLength - wavLength)(Complex(0, 0))
+    return wav
   }
   
   //Converti chaque nombre du tableau des amplitudes du fichier en complexe
@@ -66,7 +96,8 @@ object FFT {
   }
   
   //Module de chaque element de la fft
-  def ModuleFFT(fft : Array[Complex], N : Int) : Array[Double] = {
+  def ModuleFFT(sample : Array[Complex], N : Int) : Array[Double] = {
+    var fft : Array[Complex] = FFTAnalysis(sample, N)
     var module : Array[Double] = new Array(N)
     var i : Int = 0
     while(i < N) {
