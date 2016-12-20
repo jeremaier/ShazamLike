@@ -23,7 +23,7 @@ object GUI extends SimpleSwingApplication {
 	var filePath : String = ""
 	var errorMessage : String = "Attention, le dossier par defaut est vide ou ne contient pas que des fichiers .wav"
 	var directoryPath : String = System.getProperty("user.dir") + "\\BDD"
-	var cacheFile : File = new File("cache.txt")
+	val cacheFile : File = new File("cache.txt")
 	if(!cacheFile.exists())
 	  cacheFile.createNewFile()
 	var directoryFilesName : Array[String] = DirectoryFilesList(directoryPath)
@@ -46,8 +46,7 @@ object GUI extends SimpleSwingApplication {
 				  
 				  //Ouverture du selecteur de dossier avec verification que l'user appuie sur ok
           if(directoryBrowser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            var directory : File = directoryBrowser.getSelectedFile()
-            directoryPath = directory.getAbsolutePath()
+            directoryPath = directoryBrowser.getSelectedFile().getAbsolutePath()
             directoryFilesName = DirectoryFilesList(directoryPath)
             DirectoryAnalysisLaunch(peer)
           }
@@ -112,12 +111,12 @@ object GUI extends SimpleSwingApplication {
 	     * A mettre au niveau de l'affichage du resultat final
 	     * Suivi du refreshResultText()
 	     */
+  	  //Verification des tailles des chemins et reultat
 	    var directoryFontMetrics : FontMetrics = peer.getFontMetrics(directoryAndFileLabel.font)
 	    var widthHtml : Int = directoryFontMetrics.stringWidth("</html>")
 	    var widthDirectoryText : Int = directoryFontMetrics.stringWidth(directoryAndFileLabel.text.split("<br>").head) - widthHtml
 	    var widthFileText : Int = directoryFontMetrics.stringWidth(directoryAndFileLabel.text.split("<br>").last) - widthHtml
 	    var widthResultText : Int = peer.getFontMetrics(resultLabel.font).stringWidth(resultLabel.text)
-	    //verification des tailles des chemins et reultat
 	    if(widthResultText + 50 >= width || widthResultText + 50 <= width)
 	      RefreshWidth(widthResultText)
 	    if(widthFileText + 50 >= width || widthFileText + 50 <= width)

@@ -22,10 +22,10 @@ object Import {
     //Calcule la fenetre de hamming si elle n'existe pas
     Hamming(sampleLength)
     
-    var filesNumber = directoryFilesName.length
-    var filesParameters : Array[Array[Int]] = new Array(filesNumber)
-    var filesAmplitude : Array[Array[Float]] = new Array(filesNumber)
-    var filesDirectory : Array[Array[Double]] = new Array(filesNumber)
+    val filesNumber = directoryFilesName.length
+    val filesParameters : Array[Array[Int]] = new Array(filesNumber)
+    val filesAmplitude : Array[Array[Float]] = new Array(filesNumber)
+    val filesDirectory : Array[Array[Double]] = new Array(filesNumber)
     
     for(i <- 0 to filesNumber - 1) {
       var analysis = WavAnalysis(directoryPath + "\\" + directoryFilesName(i))
@@ -42,7 +42,7 @@ object Import {
   
   //Transforme une array de Int en array de Double
   def IntToFloat(ints : Array[Int], N : Int) : Array[Float] = {
-    var floats : Array[Float] = new Array(N)
+    val floats : Array[Float] = new Array(N)
     for(i <- 0 to N - 1)
       floats(i) = ints(i).toFloat
     return floats
@@ -50,12 +50,16 @@ object Import {
   
   //Passage d'un son stereo à un son mono en faisant la moyenne des 2 canaux
   def StereoToMono(canal1 : Array[Int], canal2 : Array[Int], N : Int) : Array[Float] = {
-    var stereo : Array[Float] = new Array(N)
+    val stereo : Array[Float] = new Array(N)
     var i : Int = 0
     while (i < N) {
       stereo(i) = (canal1(i) + canal2(i)).toFloat / 2
       i += 1
     }
     return stereo
+    /*
+    for(i <- 0 to N - 1)
+    	stereo(i) = (canal1(i) + canal2(i)).toFloat / 2
+    */
   }
 }

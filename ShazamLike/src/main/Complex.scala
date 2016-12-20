@@ -23,7 +23,7 @@ class Complex(val real : Double, val img : Double) {
   }
   
   //Module d'un nombre complexe
-  def Module() : Double = return hypot(this.real, this.img)
+  def mod() : Double = return hypot(this.real, this.img)
 }
 
 object Complex {
