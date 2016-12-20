@@ -6,8 +6,7 @@ import Array._
 import FFT._
 
 object Import {
-  var sampleLength : Int = 4096
-  var sampleLengthTemp : Int = sampleLength
+  var sampleLength : Int = 1024
   
   //Renvoi le son en une liste de liste de nombres representant les amplitudes en fonction du temps
   def WavAnalysis(file : String) : Array[Array[Int]] = return new WavWrapper(file).getWav()
@@ -20,8 +19,8 @@ object Import {
   def DirectoryFilesAnalysis(directoryFilesName : Array[String], directoryPath : String) {
     println("Dossier BDD : " + directoryPath)
     
-    if(sampleLength != sampleLengthTemp)
-      Hamming(sampleLength)
+    //Calcule la fenetre de hamming si elle n'existe pas
+    Hamming(sampleLength)
     
     var filesNumber = directoryFilesName.length
     var filesParameters : Array[Array[Int]] = new Array(filesNumber)
@@ -43,10 +42,10 @@ object Import {
   
   //Transforme une array de Int en array de Double
   def IntToFloat(ints : Array[Int], N : Int) : Array[Float] = {
-    var floatAnalysis : Array[Float] = new Array(N)
+    var floats : Array[Float] = new Array(N)
     for(i <- 0 to N - 1)
-      floatAnalysis(i) = ints(i).toFloat
-    return floatAnalysis
+      floats(i) = ints(i).toFloat
+    return floats
   }
   
   //Passage d'un son stereo à un son mono en faisant la moyenne des 2 canaux
@@ -54,7 +53,7 @@ object Import {
     var stereo : Array[Float] = new Array(N)
     var i : Int = 0
     while (i < N) {
-      stereo(i) = (canal1(i) + canal2(i)) / 2
+      stereo(i) = (canal1(i) + canal2(i)).toFloat / 2
       i += 1
     }
     return stereo
