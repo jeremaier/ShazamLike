@@ -11,8 +11,7 @@ object Fingerprinting {
 
   def triTemps(T: Array[Array[Float]]) : (Array[Array[Float]]) = {
     triBulle(T,2) // le tri est fait plus bas
-  }
-  return T
+    return T
   }
 // on obtient un tableau trie selon le temps 
 // maintenant on parcourt ce tableau
@@ -29,11 +28,13 @@ object Fingerprinting {
     return T // Ne marche pas si on a [A1,40,1] [A2,30,1] [A3,20,1] par exemple car sort [A2,30,1] [A3,20,1] [A1,40,1]
   //A modifier
   }
+  
+  
     def targetZone(T:Array[Array[Float]]) : (Array[Array[Array[Float]]]) = {
     //Selon le site une target zone est composee de 6 points donc on cree un tableau de tableaux de 6 points(avec point =[A,f,t]
     var targetZones : Array[Array[Array[Float]]] = Array(Array(Array()))
     for (i<-0 to T.length -7) {
-      targetZones(i) += T(i) + T(i+1) + T(i+2) + T(i+3) + T(i+4) + T(i+5)
+      targetZones(i) = T(i) + T(i+1) + T(i+2) + T(i+3) + T(i+4) + T(i+5)
     }
     return targetZones
   }
