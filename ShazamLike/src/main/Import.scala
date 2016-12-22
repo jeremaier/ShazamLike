@@ -3,6 +3,7 @@ package main
 import com.tncy.top.files.WavWrapper
 import com.tncy.top.files.Utils
 import Array._
+import BDD.folders
 import FFT._
 
 object Import {
@@ -12,14 +13,13 @@ object Import {
   def WavAnalysis(file : String) : Array[Array[Int]] = return new WavWrapper(file).getWav()
   
   //Renvoi la liste des noms des fichiers contenu dans la BDD
-  def DirectoryFilesList(directoryPath : String) : Array[String] = return Utils.listFiles(directoryPath)
-  
+  def DirectoryFilesList() : Array[Array[String]] = return Array(Utils.listFiles(folders(0).getAbsolutePath), Utils.listFiles(folders(1).getAbsolutePath), Utils.listFiles(folders(2).getAbsolutePath))
+
   //Enregistre dans 2 listes differentes les parametres de chaque son et les listes des amplitudes
   //Puis lancement des FFT
   def DirectoryFilesAnalysis(directoryFilesName : Array[String], directoryPath : String) {
     println("Dossier BDD : " + directoryPath)
     
-    //Calcule la fenetre de hamming si elle n'existe pas
     Hamming(sampleLength)
     
     val filesNumber = directoryFilesName.length

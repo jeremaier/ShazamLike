@@ -11,6 +11,7 @@ import java.awt.FontMetrics
 import java.awt.Graphics
 import FFT._
 import Import._
+import BDD._
 
 object GUI extends SimpleSwingApplication {
   var time : Long = 0
@@ -21,16 +22,13 @@ object GUI extends SimpleSwingApplication {
   }
 	val directoryAndFileLabel : Label = new Label {}
 	var filePath : String = ""
-	var errorMessage : String = "Attention, le dossier par defaut est vide ou ne contient pas que des fichiers .wav"
-	var directoryPath : String = System.getProperty("user.dir") + "\\BDD"
-	val cacheFile : File = new File("cache.txt")
-	if(!cacheFile.exists())
-	  cacheFile.createNewFile()
-	var directoryFilesName : Array[String] = DirectoryFilesList(directoryPath)
+	var directoryFilesName : Array[Array[String]] = DirectoryFilesList()
   val startButton : Button =	new Button {
 		text	=	"Choisissez un fichier .wav a analyser"
 		enabled = false
 	}
+	
+	CreateFoldersAndCache()
 	
 	def top = new MainFrame {
 	  var width : Int = 700
@@ -41,13 +39,15 @@ object GUI extends SimpleSwingApplication {
   	  contents += new Menu("Options") {                                                   //Ajout d'un menu deroulant
   	    contents += new MenuItem(swing.Action("Changer de dossier...") {
 	        val directoryBrowser = new JFileChooser(new File("."))
-	        directoryBrowser.setDialogTitle("Choisir un dossier contenant des sons")
+	        directoryBrowser.setDialogTitle("Choisissez le dossier contenant les 3 dossiers de frequences differentes")
 				  directoryBrowser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
 				  
 				  //Ouverture du selecteur de dossier avec verification que l'user appuie sur ok
           if(directoryBrowser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             directoryPath = directoryBrowser.getSelectedFile().getAbsolutePath()
-            directoryFilesName = DirectoryFilesList(directoryPath)
+            RefreshFoldersAndCacheDirectories()
+            CreateFoldersAndCache()
+            directoryFilesName = DirectoryFilesList()
             DirectoryAnalysisLaunch(peer)
           }
   	    })
@@ -146,55 +146,8 @@ object GUI extends SimpleSwingApplication {
     DirectoryAnalysisLaunch(peer)
 	}
 	
-	//Ensemble des verifications avant le lancement de l'analyse de la BDD
-	def DirectoryAnalysisLaunch(peer : java.awt.Component) {
-	  if(IsModif(new File(directoryPath))) {
-  	  if(IsDirectoryFilesAndWav(directoryFilesName, peer))
-        return DirectoryFilesAnalysis(directoryFilesName, directoryPath)
-      else errorMessageWindow(peer, errorMessage)
-	  } else errorMessageWindow(peer, "Le dossier sélectionné est le même que pour la dernière utilisation")
-  }
-	
 	//Affichage des messages d'erreur (ex : aucun fichier dans le dossier BDD)
 	def errorMessageWindow(peer : java.awt.Component, message : String) {JOptionPane.showMessageDialog(peer, message, "Erreur", JOptionPane.ERROR_MESSAGE)}
-	
-	//Verifie que le dossier BDD ne contient que des fichiers wav
-	def IsDirectoryFilesAndWav(files : Array[String], peer : java.awt.Component) : Boolean = {
-	  if(IsDirectoryFiles()) {
-      for(i <- 0 to files.length - 1) {
-        if(!files(i).toString().endsWith(".wav")) {
-          errorMessage = "Veuillez sélectionner un dossier ne contenant que des fichiers .wav"
-          return false
-        }
-	    }
-	    return true
-	  } else {
-	    errorMessage = "Ce dossier ne contient aucun fichier"
-	    return false
-	  }
-	}
-	
-	//Verifie si le dossier BDD a ete modifie ou pas pour ne pas faire l'analyse 2 fois
-	def IsModif(directory : File) : Boolean = {
-	  /*
-	  var date = directory.lastModified().toString()
-	  var cacheFileReader : String = new BufferedReader(new FileReader(cacheFile)).readLine()
-	  if(date != cacheFileReader) {
-	    var cacheFileWriter : BufferedWriter = new BufferedWriter(new FileWriter(cacheFile))
-	    cacheFileWriter.write(date)
-      cacheFileWriter.close()
-      return true
-	  } else return false
-	  */
-	  return true
-	}
-	
-	//Verifie qu'il y ai des fichiers dans le dossier BDD
-	def IsDirectoryFiles() : Boolean = {
-	  if(directoryFilesName.length > 0)
-	    return true
-	  else return false
-	}
 	
 	//Affichage du temps ecoule pour l'analyse
 	def RefreshTime(time : Float) {timeLabel.text = "Temps écoulé pour l'analyse : " + time.toString() + " secondes"}
