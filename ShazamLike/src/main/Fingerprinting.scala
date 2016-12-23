@@ -11,7 +11,7 @@ object Fingerprinting {
 
   def triTemps(T: Array[Array[Float]]) : (Array[Array[Float]]) = {
     triBulle(T,2) // le tri est fait plus bas
-  }
+  
   return T
   }
 // on obtient un tableau trie selon le temps 
@@ -54,20 +54,32 @@ object Fingerprinting {
     T(indice2) = save
     return T
   }
-  
-  def triBulle(T:Array[Array[Float]],donnee:Int){
-    var tab=T
-    for (i<-tab.length -1 to 1 by -1){
-    var tableauTrie:Boolean = true
-    for (j<- 0 to i-1) {
-    if (tab(donnee)(j+1) < tab(donnee)(j)){
-        tab=echanger(j+1,j,tab) // echanger est en haut (a modifier ?)
-        tableauTrie = false
-        if (tableauTrie) {
-          return false //on arrete la boucle
-       }
+  //http://interactivepython.org/runestone/static/pythonds/SortSearch/TheShellSort.html
+  def triShell(T:Array[Array[Float]],donnee:Int){
+    var sublistcount = T.length//2
+    while (sublistcount>0){
+      for (startposition <- 0 to sublistcount){
+        gapInstertionSort(T,startposition,sublistcount)
+        sublistcount = sublistcount //2
+      }
+    }
+    
+  }
+  def gapInsertionSort((T:Array[Array[Float]],donnee:Int,start:Int,gap:Int){
+    var currentvalue = 0
+    var position = 0
+    for (i<-start+gap to T.length by gap){
+      currentvalue = T(i)(donnee)
+      position = i
+      while (position >= gap || T(position-gap)(donnee)>currentvalue){
+        T(position)(donnee)=T(position-gap)(donnee)
+        position = position - gap
+        T(position)(donnee)=currentvalue
+      }
+      T(position)(donnee)=currentvalue
+        
+      
     }
   }
-  
 
 }
