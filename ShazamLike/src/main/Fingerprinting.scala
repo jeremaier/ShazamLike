@@ -10,13 +10,8 @@ object Fingerprinting {
    
 
   def triTemps(T: Array[Array[Float]]) : (Array[Array[Float]]) = {
-    triBulle(T,2) // le tri est fait plus bas
-<<<<<<< HEAD
+    triShell(T,2) // le tri est fait plus bas
     return T
-=======
-  
-  return T
->>>>>>> a7c560d7983199a4c20bbcf489aec20aa406956a
   }
 // on obtient un tableau trie selon le temps 
 // maintenant on parcourt ce tableau
@@ -39,7 +34,7 @@ object Fingerprinting {
     //Selon le site une target zone est composee de 6 points donc on cree un tableau de tableaux de 6 points(avec point =[A,f,t]
     var targetZones : Array[Array[Array[Float]]] = Array(Array(Array()))
     for (i<-0 to T.length -7) {
-      targetZones(i) = T(i) + T(i+1) + T(i+2) + T(i+3) + T(i+4) + T(i+5)
+      targetZones(i) = [T(i),T(i+1),T(i+2),T(i+3),T(i+4),T(i+5)]
     }
     return targetZones
   }
@@ -51,6 +46,7 @@ object Fingerprinting {
       for (i<-3 to targetZone.length) {
         emp += (T(i-3)(1),targetZone(i)(3)(1),targetZone(i)(3)(2)-T(i-3)(2)) // HELP JE SAIS PAS LECRIRE
         }
+      //on retourne [fréquence du point d'ancrage, fréquence du point de début de target zone ,delta temps entre le point d'ancrage et le point] 
       return emp
     }
     
@@ -71,6 +67,7 @@ object Fingerprinting {
     }
     
   }
+  
   def gapInsertionSort((T:Array[Array[Float]],donnee:Int,start:Int,gap:Int){
     var currentvalue = 0
     var position = 0
