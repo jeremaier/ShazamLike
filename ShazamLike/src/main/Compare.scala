@@ -8,9 +8,8 @@ object Compare
 //3: on vérifie la cohérence temporelle entre chaque targetZone de l'enchantillon et celle du morceau
 //4: on garde celles qui sont cohérentes
 //5: 
- 
-  
-def coherenceTempZone(T : Array[Array[Array[Float]]])={
+
+def coherenceTempZone(T : Array[Array[Array[Float]]]):Int={
   //fonction qui prend en entree deux listes: 
   //sampleZone est une target Zone de l'enchantillon
   //songZones est une liste de target zones correspondantes dans un morceau
@@ -26,7 +25,35 @@ def coherenceTempZone(T : Array[Array[Array[Float]]])={
     }
   //la fonction n'est pas terminée
   
+  }  
+  
+def maxDelta(deltaTab:Array[Float]):Float={
+//fonction qui prend en argument une liste de delta 
+//et qui retourne la valeur ayant le plus d'occurences
+  var deltamax=deltaTab(0)
+  for (i<-0 to deltaTab.length-2){
+    if (countDelta(deltaTab,deltaTab(i+1))>countDelta(deltaTab,deltaTab(i))){
+      deltamax=deltaTab(i+1)
+      }
+    }
+  return deltamax
   }
+
+
+
+def countDelta(deltaTab:Array[Float],delta:Float):Int={  
+  //fonction qui prend en entrée une liste de deltas et une valeur de delta
+  //et qui ressort le nombre d'occurences de cette valeur
+  var countDelta:Int=0
+  var deltamax=deltaTab(0)
+  for (i<-1 to deltaTab.length-1){
+    if (deltaTab(i)==delta){
+      countDelta+=1
+      }
+    }
+  return countDelta
+  }
+  
   
 def matchingRate(sample : Array[Array[Float]], song : Array[Array[Float]]):Float={
   //fonction qui compare un echantillon et une chanson entière
