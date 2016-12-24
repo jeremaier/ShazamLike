@@ -9,20 +9,28 @@ object Compare
 //4: on garde celles qui sont cohérentes
 //5: 
 
-def coherenceTempZone(T : Array[Array[Array[Float]]]):Int={
+def comparaison(sample:Array[Array[Float]],song:Array[Array[Float]]):Float={
+  //fonction qui prend en entrée un echantillon et un morceau
+  //et qui renvoie le pourcentage de "matching"
+  //seulement si la cohérence temporelle est réalisée
+  
+}
+  
+def coherenceTempZone(T : Array[Array[Array[Float]]]):Boolean={
   //fonction qui prend en entree deux listes: 
   //sampleZone est une target Zone de l'enchantillon
   //songZones est une liste de target zones correspondantes dans un morceau
-  //et qui renvoie
+  //et qui renvoie True si la cohérence temporelle est valable
   //T=[[[sampleZone1],[songZoneassociee1a],[songZoneassociee1b],...],[[sampleZone2],[[songZoneassociee2a],[songZoneassociee2b]]]]
-  var deltas:Array[Float]=Array()
+  var deltaTab:Array[Float]=Array()
   var zone:Array[Array[Float]]=Array(Array())
   for (i<-0 to T.length-1){
     var zone=T(i) //cette variable contient[[sampleZone1],[songZoneassociee1a],[songZoneassociee1b],...]
     for (j<-0 to zone.length-2){
-      deltas(i+j)=math.abs(zone(0)(2)-zone(j)(2))
+      deltaTab(i+j)=math.abs(zone(0)(2)-zone(j)(2))
       }
     }
+  if ()
   //la fonction n'est pas terminée
   
   }  
