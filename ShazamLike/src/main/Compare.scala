@@ -1,7 +1,33 @@
 package main
-
+import scala.math._
 object Compare 
 {
+//objectif: comparer un échantillon avec chaque morceau de la base de donnee
+//1: pour un echantillon, on calcule le taux le compatibilité avec chaque morceau de la base de donnee
+//2: on garde que ceux dont le taux est superieur à 90% et on garde les targetZones concernees
+//3: on vérifie la cohérence temporelle entre chaque targetZone de l'enchantillon et celle du morceau
+//4: on garde celles qui sont cohérentes
+//5: 
+ 
+  
+def coherenceTempZone(T : Array[Array[Array[Float]]])={
+  //fonction qui prend en entree deux listes: 
+  //sampleZone est une target Zone de l'enchantillon
+  //songZones est une liste de target zones correspondantes dans un morceau
+  //et qui renvoie
+  //T=[[[sampleZone1],[songZoneassociee1a],[songZoneassociee1b],...],[[sampleZone2],[[songZoneassociee2a],[songZoneassociee2b]]]]
+  var deltas:Array[Float]=Array()
+  var zone:Array[Array[Float]]=Array(Array())
+  for (i<-0 to T.length-1){
+    var zone=T(i) //cette variable contient[[sampleZone1],[songZoneassociee1a],[songZoneassociee1b],...]
+    for (j<-0 to zone.length-2){
+      deltas(i+j)=math.abs(zone(0)(2)-zone(j)(2))
+      }
+    }
+  //la fonction n'est pas terminée
+  
+  }
+  
 def matchingRate(sample : Array[Array[Float]], song : Array[Array[Float]]):Float={
   //fonction qui compare un echantillon et une chanson entière
   //et retourne leur taux de "matching"
@@ -12,13 +38,12 @@ def matchingRate(sample : Array[Array[Float]], song : Array[Array[Float]]):Float
   for (i<-0 to sample.length-1){
     for (j<-0 to song.length-1)
       {
-      if (sample(i)(0)==song(j)(0) && sample(i)(1)==song(j)(1) && sample(i)(2)==song(j)(2)){
+      if (sample(i)(0)==song(j)(0) && sample(i)(1)==song(j)(1)){
+        //ici la comparaison n'est faite que sur les fréquences
         rate=rate+1 //une targetZone ne peut être présente qu'une seule fois dans chaque liste
         }
       }
     }
   return rate/sample.length
   }
-
-
 }
