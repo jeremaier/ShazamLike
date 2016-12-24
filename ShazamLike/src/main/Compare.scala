@@ -30,8 +30,9 @@ def coherenceTempZone(T : Array[Array[Array[Float]]]):Boolean={
       deltaTab(i+j)=math.abs(zone(0)(2)-zone(j)(2))
       }
     }
-  if ()
+  if (){}
   //la fonction n'est pas terminée
+  //il reste la partie concernant le delta de temps
   
   }  
   
