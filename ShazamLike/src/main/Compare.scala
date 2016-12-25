@@ -9,18 +9,25 @@ object Compare
 //4: on garde celles qui sont cohérentes
 //5: 
 
-def comparaison(sample:Array[Array[Float]],song:Array[Array[Float]]):Float={
+def matching(sample:Array[Array[Float]],database:Array[Array{Float]]):Array={
+  //on prendra database=Fingerprinting.resume(
+  
+}
+
+def compareSong(sample:Array[Array[Float]],database:Array[Array[Float]]):Float={
   //fonction qui prend en entrée un echantillon et un morceau
   //et qui renvoie le pourcentage de "matching"
   //seulement si la cohérence temporelle est réalisée
-  
+  for (i<-0 to database.length-1){
+    
+    }
 }
   
 def coherenceTempZone(T : Array[Array[Array[Float]]]):Boolean={
   //fonction qui prend en entree deux listes: 
   //sampleZone est une target Zone de l'enchantillon
   //songZones est une liste de target zones correspondantes dans un morceau
-  //et qui renvoie True si la cohérence temporelle est valable
+  //et qui renvoie 
   //T=[[[sampleZone1],[songZoneassociee1a],[songZoneassociee1b],...],[[sampleZone2],[[songZoneassociee2a],[songZoneassociee2b]]]]
   var deltaTab:Array[Float]=Array()
   var zone:Array[Array[Float]]=Array(Array())
@@ -28,20 +35,21 @@ def coherenceTempZone(T : Array[Array[Array[Float]]]):Boolean={
     var zone=T(i) //cette variable contient[[sampleZone1],[songZoneassociee1a],[songZoneassociee1b],...]
     for (j<-0 to zone.length-2){
       deltaTab(i+j)=math.abs(zone(0)(2)-zone(j)(2))
+      //on ajoute à deltaTab tous les delta de temps
       }
     }
-  if (){}
-  //la fonction n'est pas terminée
-  //il reste la partie concernant le delta de temps
+  if (countDelta(maxDelta(deltaTab)){}//c'est le nombre de fois que le delta ayant le plus d'occurences apparait
+    
   
   }  
   
 def maxDelta(deltaTab:Array[Float]):Float={
 //fonction qui prend en argument une liste de delta 
-//et qui retourne la valeur ayant le plus d'occurences
+//et qui retourne la valeur ayant le plus d'occurences dans la liste
   var deltamax=deltaTab(0)
   for (i<-0 to deltaTab.length-2){
     if (countDelta(deltaTab,deltaTab(i+1))>countDelta(deltaTab,deltaTab(i))){
+      //on compare le nombre de fois qu'existe un delta dans le tableau
       deltamax=deltaTab(i+1)
       }
     }
