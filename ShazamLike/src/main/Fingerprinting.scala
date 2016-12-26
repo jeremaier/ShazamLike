@@ -11,7 +11,7 @@ object Fingerprinting {
   //fonction qui résume
   def resume(T:[Array[Array[Float]]):(Array[Array[Float])={
     var tab = triTemps(T)
-    tab = triFrequence
+    tab = triFrequence(tab)
     targetzones=targetZone(tab)
     fingerprint=empreinte(targetzones,tab)
     return targetzones,fingerprint
@@ -82,7 +82,7 @@ object Fingerprinting {
     while (sublistcount>0){
       for (startposition <- 0 to sublistcount){
         print("After increment of size", sublistcount, "The list is",alist)
-        gapInstertionSort(T,startposition,sublistcount)
+        gapInsertionSort(T,startposition,sublistcount)
         sublistcount = sublistcount //2
       }
     }
