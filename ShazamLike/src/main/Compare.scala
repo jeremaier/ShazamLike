@@ -13,6 +13,17 @@ def matching(sample:Array[Array[Float]],database:Array[Array[Array[Float]]]):Flo
   //fonction qui prend en entrée un échantillon sous forme d'empreinte
   //et une base de donnée sous la forme [[[ID1],[empreinte1],[empreinte2]],[[ID2],[empreinte1],[empreinte2]]]
   //et qui renvoie l'identifiant de la chanson la plus susceptible de matcher avec l'echantillon
+  
+  //si on a un taux de matching supérieur à 80%
+  //on ajoute la chanson à une liste 
+  //puis on fait l'analyse temporelle dessus
+  return timeCoherency(sample,potentialMatching(sample,database))
+  }
+
+
+def potentialMatching(sample:Array[Array[Float]],database:Array[Array[Array[Float]]]):Array[Array[Array[Float]]]={
+  //et qui renvoie les morceaux susceptibles de collet au sample
+  //d'après la ressemblance des empreintes (sans coherence temporelle)
   var empreintes=database
   var potentialMatching:Array[Array[Array[Float]]]=Array(Array(Array()))
   var j=0 //indice d'incrémentation de la liste potentialMatching
@@ -24,26 +35,45 @@ def matching(sample:Array[Array[Float]],database:Array[Array[Array[Float]]]):Flo
       }
     //si on a un taux de matching supérieur à 80%
     //on ajoute la chanson à une liste 
-    //puis on fait l'analyse temporelle:
     }
+  return potentialMatching
+  }
+
+def timeCoherency(sample:Array[Array[Float]],potentialMatching:Array[Array[Array[Float]]]):Float={
+  //fonction qui prend en entree un sample et une liste de morceau matchant sur le plan frequenciel
+  //et qui renvoie, apres analyse temporelle
+  //l'ID de la chanson correspondant le plus
   var nbMaxDelta:Array[Float]=Array()
-  for (k<-0 to potentialMatching.length-1){
+  for (i<-0 to potentialMatching.length-1){
     //pour chaque morceau potentiellement ressemblant
-    var potentialSong=potentialMatching(k).slice(1,potentialMatching.length)
+    var potentialSong=potentialMatching(i).slice(1,potentialMatching.length)
     var correspondingTab=matchingRate(sample,potentialSong)._2
     //tableau des correspondances de chaque empreinte de sample avec celles de song
     var deltaTab:Array[Float]=Array()
-    for (l<-0 to correspondingTab.length-1){
-      deltaTab++computeDelta(correspondingTab(l))
+    for (j<-0 to correspondingTab.length-1){
+      deltaTab++computeDelta(correspondingTab(j))
       //on ajoute a la liste des delta les delta pour chaque correspondance de sample
       }
-    nbMaxDelta(k)=countDelta(deltaTab,maxDelta(deltaTab))
+    nbMaxDelta(i)=countDelta(deltaTab,maxDelta(deltaTab))
     //on rajoute le nombre d'occurences du delta le plus présent dans deltaTab
     //pour chaque chanson
     }
   return potentialMatching(indiceMax(nbMaxDelta))(0)(0)
-  //on retourne l'ID de la chanson matchant à plus de 80% et cohérente temporellement
-}
+  }
+
+def indiceMax(T:Array[Float]):Int={
+  //fonction qui prend en entree une liste T
+  //et qui renvoie l'indice du maximum de la liste
+  var indice=0
+  for (i<-1 to T.length-1){
+    if (T(i)>T(indice)){
+      indice=i
+      }
+    }
+  return indice
+  }
+
+
 
 def matchingRate(sample : Array[Array[Float]], song : Array[Array[Float]]):(Float,Array[Array[Array[Float]]])={
   //fonction qui compare un echantillon et une chanson entière
@@ -119,17 +149,5 @@ def countDelta(deltaTab:Array[Float],delta:Float):Int={
       }
     }
   return countDelta
-  }
-  
-def indiceMax(T:Array[Float]):Int={
-  //fonction qui prend en entree une liste T
-  //et qui renvoie l'indice du maximum de la liste
-  var indice=0
-  for (i<-1 to T.length-1){
-    if (T(i)>T(indice)){
-      indice=i
-      }
-    }
-  return indice
   }
 }
