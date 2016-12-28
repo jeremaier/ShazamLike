@@ -18,7 +18,7 @@ def matching(sample:Array[Array[Float]],database:Array[Array[Array[Float]]]):Flo
   var j=0 //indice d'incrémentation de la liste potentialMatching
   for (i<-0 to empreintes.length-1){
     var song=empreintes(i).slice(1,empreintes.length)//on retire l'id de la chanson
-    if (matchingRate(sample,song)(0)>=0.8){
+    if (matchingRate(sample,song)._1>=0.8){
       potentialMatching(j)=empreintes(i)
       j+=1
       }
@@ -28,8 +28,10 @@ def matching(sample:Array[Array[Float]],database:Array[Array[Array[Float]]]):Flo
     }
   var nbMaxDelta:Array[Float]=Array()
   for (k<-0 to potentialMatching.length-1){
-    
+    var potentialSong=potentialMatching(k).slice(1,potentialMatching.length)
+    matchingRate(
     }
+  return 
 }
 
 def matchingRate(sample : Array[Array[Float]], song : Array[Array[Float]]):(Float,Array[Array[Array[Float]]])={
@@ -66,8 +68,8 @@ def matchingRate(sample : Array[Array[Float]], song : Array[Array[Float]]):(Floa
       //sinon on reprend cet indice k non rempli 
       //et on l'utilise pour stocker les new valeurs de l'indice suivant
     }
-  var taux=rate/sample.length
-  return taux,correspondingFingerprints
+  var taux:Float=rate/sample.length
+  return (taux,correspondingFingerprints)
   }
   
 def coherenceTemp(song : Array[Array[Array[Float]]]):Boolean={
