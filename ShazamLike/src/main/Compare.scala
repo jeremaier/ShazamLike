@@ -18,7 +18,7 @@ def matching(sample:Array[Array[Float]],database:Array[Array[Array[Float]]]):Flo
   var j=0 //indice d'incrémentation de la liste potentialMatching
   for (i<-0 to empreintes.length-1){
     var song=empreintes(i).slice(1,empreintes.length)//on retire l'id de la chanson
-    if (matchingRate(sample,song)>=0.8){
+    if (matchingRate(sample,song)(0)>=0.8){
       potentialMatching(j)=empreintes(i)
       j+=1
       }
@@ -32,12 +32,48 @@ def matching(sample:Array[Array[Float]],database:Array[Array[Array[Float]]]):Flo
     }
 }
 
+def matchingRate(sample : Array[Array[Float]], song : Array[Array[Float]]):(Float,Array[Array[Array[Float]]])={
+  //fonction qui compare un echantillon et une chanson entière
+  //et retourne leur taux de "matching" 
+  //ainsi que la liste des empreintes qui correspondent entre elles
+  //sous la forme [[[sampleEmpreinte1],[correspondingEmpreinte1A],[correspondingEmpreinte1B]],[[sampleEmpreinte1],[correspondingEmpreinte1A],[correspondingEmpreinte1B]]]
+  //la forme des données song et sample sont des tableaux de la forme
+  // [[f-ancrage,f-point,delta-temps],[f-ancrage,f-point,delta-temps]]
+  //ce sont donc deux tableaux contenant des empreintes
+  var rate:Float=0
+  var correspondingFingerprints:Array[Array[Array[Float]]]=Array(Array(Array()))
+  //tableau contenant la liste des empreintes de sample avec leurs correspondances dans song
+  var k=0 //indice pour remplir correspondingFingerprints avec chaque liste de correpondance
+  var l=1 //indice pour remplir correspondingFingerprints avec chaque correspondance
+  for (i<-0 to sample.length-1){
+    var rempli:Boolean=false//pour savoir si le sample d'indice i a une correspondance
+    correspondingFingerprints(k)(0)=sample(i) //on rajoute l'élément de sample
+    for (j<-0 to song.length-1){
+      if (sample(i)(0)==song(j)(0) && sample(i)(1)==song(j)(1)){
+        //on compare les deux fréquences présentes dans les empreintes
+        rate=rate+1 
+        //rq: on suppose qu'une empreinte ne peut être présente qu'une seule fois dans chaque liste  
+        correspondingFingerprints(k)(l)=song(j)
+        l+=1
+        rempli=true
+        }
+      }
+    if (rempli){
+      k+=1
+      } 
+      //si on a eu des correspondances avec sample(i)
+      //on rempli correspondingFingerprints a la suite
+      //sinon on reprend cet indice k non rempli 
+      //et on l'utilise pour stocker les new valeurs de l'indice suivant
+    }
+  var taux=rate/sample.length
+  return taux,correspondingFingerprints
+  }
   
-def coherenceTempZone(T : Array[Array[Array[Float]]]):Boolean={
+def coherenceTemp(song : Array[Array[Array[Float]]]):Boolean={
   //fonction qui prend en entree un morceau sous forme d'une liste d'empreintes
   //et qui renvoie le nombre de fois où le delta max apparaît
   var deltaTab:Array[Float]=Array()
-  var zone:Array[Array[Float]]=Array(Array())
   for (i<-0 to T.length-1){
     for (j<-0 to zone.length-2){
       deltaTab(i+j)=math.abs(zone(0)(2)-zone(j)(2))
@@ -77,23 +113,4 @@ def countDelta(deltaTab:Array[Float],delta:Float):Int={
   return countDelta
   }
   
-  
-def matchingRate(sample : Array[Array[Float]], song : Array[Array[Float]]):Float={
-  //fonction qui compare un echantillon et une chanson entière
-  //et retourne leur taux de "matching"
-  //la forme des données song et sample sont des tableaux de la forme
-  // [[f-ancrage,f-point,delta-temps],[f-ancrage,f-point,delta-temps]]
-  //ce sont donc deux tableaux contenant des target zones
-  var rate:Float=0
-  for (i<-0 to sample.length-1){
-    for (j<-0 to song.length-1)
-      {
-      if (sample(i)(0)==song(j)(0) && sample(i)(1)==song(j)(1)){
-        //ici la comparaison n'est faite que sur les fréquences
-        rate=rate+1 //une targetZone ne peut être présente qu'une seule fois dans chaque liste
-        }
-      }
-    }
-  return rate/sample.length
-  }
 }
