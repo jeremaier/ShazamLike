@@ -4,35 +4,41 @@ object Compare
 {
 //objectif: comparer un échantillon avec chaque morceau de la base de donnee
 //1: pour un echantillon, on calcule le taux le compatibilité avec chaque morceau de la base de donnee
-//2: on garde que ceux dont le taux est superieur à 90% et on garde les targetZones concernees
-//3: on vérifie la cohérence temporelle entre chaque targetZone de l'enchantillon et celle du morceau
-//4: on garde celles qui sont cohérentes
-//5: 
+//2: on garde que ceux dont le taux est superieur à 90% et on garde les empreintes concernees
+//3: on vérifie la cohérence temporelle entre chaque empreinte de l'enchantillon et celle du morceau
+//4: on garde celle qui est la plus cohérente temporellement
+  // i.e. celle qui a le plus grand nombre de delta cohérent
 
-def matching(sample:Array[Array[Float]],database:Array[Array{Float]]):Array={
-  //on prendra database=Fingerprinting.resume(
-  
-}
-
-def compareSong(sample:Array[Array[Float]],database:Array[Array[Float]]):Float={
-  //fonction qui prend en entrée un echantillon et un morceau
-  //et qui renvoie le pourcentage de "matching"
-  //seulement si la cohérence temporelle est réalisée
-  for (i<-0 to database.length-1){
+def matching(sample:Array[Array[Float]],database:Array[Array[Array[Float]]]):Float={
+  //fonction qui prend en entrée un échantillon sous forme d'empreinte
+  //et une base de donnée sous la forme [[[ID1],[empreinte1],[empreinte2]],[[ID2],[empreinte1],[empreinte2]]]
+  //et qui renvoie l'identifiant de la chanson la plus susceptible de matcher avec l'echantillon
+  var empreintes=database
+  var potentialMatching:Array[Array[Array[Float]]]=Array(Array(Array()))
+  var j=0 //indice d'incrémentation de la liste potentialMatching
+  for (i<-0 to empreintes.length-1){
+    var song=empreintes(i).slice(1,empreintes.length)//on retire l'id de la chanson
+    if (matchingRate(sample,song)>=0.8){
+      potentialMatching(j)=empreintes(i)
+      j+=1
+      }
+    //si on a un taux de matching supérieur à 80%
+    //on ajoute la chanson à une liste 
+    //puis on fait l'analyse temporelle:
+    }
+  var nbMaxDelta:Array[Float]=Array()
+  for (k<-0 to potentialMatching.length-1){
     
     }
 }
+
   
 def coherenceTempZone(T : Array[Array[Array[Float]]]):Boolean={
-  //fonction qui prend en entree deux listes: 
-  //sampleZone est une target Zone de l'enchantillon
-  //songZones est une liste de target zones correspondantes dans un morceau
-  //et qui renvoie 
-  //T=[[[sampleZone1],[songZoneassociee1a],[songZoneassociee1b],...],[[sampleZone2],[[songZoneassociee2a],[songZoneassociee2b]]]]
+  //fonction qui prend en entree un morceau sous forme d'une liste d'empreintes
+  //et qui renvoie le nombre de fois où le delta max apparaît
   var deltaTab:Array[Float]=Array()
   var zone:Array[Array[Float]]=Array(Array())
   for (i<-0 to T.length-1){
-    var zone=T(i) //cette variable contient[[sampleZone1],[songZoneassociee1a],[songZoneassociee1b],...]
     for (j<-0 to zone.length-2){
       deltaTab(i+j)=math.abs(zone(0)(2)-zone(j)(2))
       //on ajoute à deltaTab tous les delta de temps
