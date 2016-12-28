@@ -9,37 +9,50 @@ object BDD {
   var directoryPath : String = System.getProperty("user.dir") + "\\BDD"
   var folders : Array[File] = Array(new File(directoryPath), new File(directoryPath + "\\11"), new File(directoryPath + "\\22"), new File(directoryPath + "\\44"))
 	var cacheFiles : Array[File] = Array(new File(directoryPath + "\\cache.txt"), new File(folders(1).getAbsolutePath + "\\cache.txt"), new File(folders(2).getAbsolutePath + "\\cache.txt"), new File(folders(3).getAbsolutePath + "\\cache.txt"))
-	val modif : Array[Boolean] = Array(false, false, false, false)
+	val modif : Array[Boolean] = Array(true, true, false, false)
   var errorMessage : String = "Attention, le dossier par defaut est vide ou ne contient pas que des fichiers .wav"
-	
+	      
   //Creation des fichiers et dossiers necessaires a l'analyse de BDD s'il n'existe pas
   def CreateFoldersAndCache() {
     for(i <- 0 to 3) {
-  	  if(!folders(i).exists()) {
-  	    folders(i).mkdir()
-  	    cacheFiles(i).createNewFile()
-  	  }
+  	  if(!folders(i).exists())
+  	    folders(i).mkdirs()
+  	  cacheFiles(i).createNewFile()
     }
-	  cacheFiles(0).createNewFile()
 	}
   
 	//Verifie si le dossier BDD a ete modifie ou pas pour ne pas faire l'analyse 2 fois
 	def IsModif() {
-	  val dateBDD : Array[String] = Array()
-	  for(i <- 0 to 3)
-	    dateBDD(i) = folders(i).lastModified().toString()
-
-  	val cacheBr : BufferedReader = new BufferedReader(new FileReader(dateBDD(0)))
-  	val cacheBw : BufferedWriter = new BufferedWriter(new FileWriter(folders(0)))
+	  val dateBDD : Array[String] = new Array(4)
+	  var dateMax : String = "0"
 	  for(i <- 0 to 3) {
-  	  if(dateBDD(i) != cacheBr.readLine()) {
-  	    cacheBw.append(dateBDD(i))
-        cacheBw.newLine()
-        modif(i) = true
+	    dateBDD(i) = folders(i).lastModified().toString()
+	    if(dateBDD(0) < dateBDD(i))
+	      dateMax = dateBDD(i)
+	  }
+	  dateBDD(0) = dateMax
+
+  	val cacheBr : BufferedReader = new BufferedReader(new FileReader(cacheFiles(0)))
+	  
+	  if(dateBDD(0) != cacheBr.readLine()) {
+	    modif(0) = true
+  	  for(i <- 1 to 3) {
+  	    var date : String = cacheBr.readLine()
+    	  if(dateBDD(i) != date)
+          modif(i) = true
   	  }
 	  }
-	  cacheBw.close()
+	  
 	  cacheBr.close()
+	  
+	  val cacheBw : BufferedWriter = new BufferedWriter(new FileWriter(cacheFiles(0)))
+	  
+	  for(i <- 0 to 3) {
+	    cacheBw.append(dateBDD(i))
+      cacheBw.newLine()
+	  }
+	  
+	  cacheBw.close()
 	}
 	
 	//Reinitialisation de la liste des dossiers qui ont ete modifie
@@ -53,19 +66,22 @@ object BDD {
   	val cacheS : Scanner = new Scanner(cacheFiles(i))
 	  while (true)
     {
-        object allDone extends Exception {}
-        try {
-          for(i <- 0 to 4) {
-        	  for(j <- 0 to 4)
-        	    cacheS.nextDouble()
-        	}
-        } catch {case allDone : Throwable =>}
+      object allDone extends Exception {}
+      try {
+        for(i <- 0 to 4) {
+      	  for(j <- 0 to 4)
+      	    cacheS.nextDouble()
+      	}
+      } catch {case allDone : Throwable =>}
     }
 	  cacheS.close()
 	}
 	
 	//Va ecrire le resultat des analyses de BDD precedentes
 	def CacheWriter(i : Int) {
+	  //Ecrire a la suite
+	  //val cacheBw : BufferedWriter = new BufferedWriter(new FileWriter(cacheFiles(0), true))
+
   	val cachePw : PrintWriter = new PrintWriter(cacheFiles(i))
     for(i <- 0 to 4) {
   	  for(j <- 0 to 3)
@@ -77,13 +93,14 @@ object BDD {
   
 	//Ensemble des verifications avant le lancement de l'analyse de la BDD
 	def DirectoryAnalysisLaunch(peer : java.awt.Component) {
+	  IsModif()
+	  
 	  if(modif(0)) {
 	    for(i <- 1 to 3) {
 	      if(modif(i)) {
-      	  if(IsDirectoryFilesAndWav(i, peer)) {
-      	    sampleLength = i * 1024
-      	    DirectoryFilesAnalysis(directoryFilesName(i), directoryPath)
-      	  } else errorMessageWindow(peer, errorMessage)
+      	  if(IsDirectoryFilesAndWav(i - 1, peer))
+      	    DirectoryFilesAnalysis(directoryFilesName(i - 1), directoryPath, i - 1, i * 1024)
+      	  else errorMessageWindow(peer, errorMessage)
 	      } else {
 	        var ModifErrorMessage : String = "Le dossier des sons de 11kHz est le même que pour la dernière utilisation"
 	        i match {
@@ -109,8 +126,8 @@ object BDD {
       for(i <- 0 to files.length - 1) {
         if(!files(i).toString().endsWith(".wav")) {
           folderNumber match {
-            case 2 => errorMessage = "Le dossier des sons de 22kHz ne contient pas que des fichiers .wav"
-            case 3 => errorMessage = "Le dossier des sons de 44kHz ne contient pas que des fichiers .wav"
+            case 1 => errorMessage = "Le dossier des sons de 22kHz ne contient pas que des fichiers .wav"
+            case 2 => errorMessage = "Le dossier des sons de 44kHz ne contient pas que des fichiers .wav"
             case _ => errorMessage = "Le dossier des sons de 11kHz ne contient pas que des fichiers .wav"
           }
           return false
@@ -119,8 +136,8 @@ object BDD {
 	    return true
 	  } else {
 	    folderNumber match {
+        case 1 => errorMessage = "Le dossier des sons de 11kHz ne contient aucun fichier"
         case 2 => errorMessage = "Le dossier des sons de 11kHz ne contient aucun fichier"
-        case 3 => errorMessage = "Le dossier des sons de 11kHz ne contient aucun fichier"
         case _ => errorMessage = "Le dossier des sons de 11kHz ne contient aucun fichier"
       }
 	    return false
