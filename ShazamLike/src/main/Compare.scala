@@ -28,10 +28,21 @@ def matching(sample:Array[Array[Float]],database:Array[Array[Array[Float]]]):Flo
     }
   var nbMaxDelta:Array[Float]=Array()
   for (k<-0 to potentialMatching.length-1){
+    //pour chaque morceau potentiellement ressemblant
     var potentialSong=potentialMatching(k).slice(1,potentialMatching.length)
-    matchingRate(
+    var correspondingTab=matchingRate(sample,potentialSong)._2
+    //tableau des correspondances de chaque empreinte de sample avec celles de song
+    var deltaTab:Array[Float]=Array()
+    for (l<-0 to correspondingTab.length-1){
+      deltaTab++computeDelta(correspondingTab(l))
+      //on ajoute a la liste des delta les delta pour chaque correspondance de sample
+      }
+    nbMaxDelta(k)=countDelta(deltaTab,maxDelta(deltaTab))
+    //on rajoute le nombre d'occurences du delta le plus présent dans deltaTab
+    //pour chaque chanson
     }
-  return 
+  return potentialMatching(indiceMax(nbMaxDelta))(0)(0)
+  //on retourne l'ID de la chanson matchant à plus de 80% et cohérente temporellement
 }
 
 def matchingRate(sample : Array[Array[Float]], song : Array[Array[Float]]):(Float,Array[Array[Array[Float]]])={
@@ -72,19 +83,16 @@ def matchingRate(sample : Array[Array[Float]], song : Array[Array[Float]]):(Floa
   return (taux,correspondingFingerprints)
   }
   
-def coherenceTemp(song : Array[Array[Array[Float]]]):Boolean={
-  //fonction qui prend en entree un morceau sous forme d'une liste d'empreintes
-  //et qui renvoie le nombre de fois où le delta max apparaît
+def computeDelta(T : Array[Array[Float]]):Array[Float]={
+  //fonction qui prend en entree une liste sous la forme
+  //[[sample],[correspondance1],[correspondance2]]
+  //et qui renvoie une liste de delta calculés chacuns pour une correspondance
   var deltaTab:Array[Float]=Array()
-  for (i<-0 to T.length-1){
-    for (j<-0 to zone.length-2){
-      deltaTab(i+j)=math.abs(zone(0)(2)-zone(j)(2))
+  for (i<-1 to T.length-1){
+      deltaTab(i-1)=math.abs(T(0)(2)-T(i)(2))
       //on ajoute à deltaTab tous les delta de temps
-      }
     }
-  if (countDelta(maxDelta(deltaTab)){}//c'est le nombre de fois que le delta ayant le plus d'occurences apparait
-    
-  
+  return deltaTab
   }  
   
 def maxDelta(deltaTab:Array[Float]):Float={
@@ -100,8 +108,6 @@ def maxDelta(deltaTab:Array[Float]):Float={
   return deltamax
   }
 
-
-
 def countDelta(deltaTab:Array[Float],delta:Float):Int={  
   //fonction qui prend en entrée une liste de deltas et une valeur de delta
   //et qui ressort le nombre d'occurences de cette valeur
@@ -115,4 +121,15 @@ def countDelta(deltaTab:Array[Float],delta:Float):Int={
   return countDelta
   }
   
+def indiceMax(T:Array[Float]):Int={
+  //fonction qui prend en entree une liste T
+  //et qui renvoie l'indice du maximum de la liste
+  var indice=0
+  for (i<-1 to T.length-1){
+    if (T(i)>T(indice)){
+      indice=i
+      }
+    }
+  return indice
+  }
 }
