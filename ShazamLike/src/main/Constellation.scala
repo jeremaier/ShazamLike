@@ -3,28 +3,39 @@
 package main
 
 object Constellation {
-  def empreinte(T : Array[Array[Float]]) : (Array[Array[Float]]) = {
+  def empreinte(T : Array[Array[Float]]) : Array[Array[Float]] = {
     //on suppose que le tableau est de la forme T=[[A,f,t],[ ], ...]
     //il faut que le tableau d'amplitudes soit trie en fonction du temps
     //on reorganise les amplitudes en fonction des frequences (croissantes) (c'est ce qui sort de la fft)
     var Tabmax : Array[Array[Float]] = Array(Array())
-    var bandes : Array[Int] = Array(0, 2, 4, 8, 16, 32, 64, 128, 256, T.length - 1)
+    var j=0
+    var bandes = arrayGen2x(0,Tabmax.length)
     for (i <- 0 to bandes.length - 2) { 
-      var TabBande : Array[Array[Float]] = selection(T, bandes(i), bandes(i + 1)) //on selectionne les differentes bandes de frequence
-      Tabmax +:= maxA(TabBande) //pour chaque bande de frequence on garde le max d'amplitude
-      
-      //var compteur = 0
-      //while (math.log10(T(compteur)(1)) < palier)
-      //{
-        //TabBande +:= T(compteur)
-        //compteur += 1
-      //}
-    }
-    var moy = moyenneA(Tabmax)
-    Tabmax = supMoyA(Tabmax, moy) //on garde seulement les amplitudes superieures a la moyenne
+      var TabBande = select(T, bandes(i), bandes(i + 1)) //on selectionne les differentes bandes de frequence
+      if (T(i)(1)<=5000){ //on prend que les frequences inférieures à 5000Hz
+        Tabmax(j)= maxA(TabBande) //pour chaque bande de frequence on garde le max d'amplitude
+        j+=1
+        }
+      }
+    Tabmax = supMoyA(Tabmax, moyenneA(Tabmax)) //on garde seulement les amplitudes superieures a la moyenne
     return Tabmax
   }
   
+  
+ def arrayGen2x(debut:Int,fin:Int):Array[Float]={
+    //fonction permettant de générer un tableau de 2*x
+    var liste:Array[Float]=Array(debut)
+    var i=0
+    while(i<fin){
+      if (liste(i)==0){
+        liste(i+1)=2
+        }
+      else{
+        liste(i+1)=2*liste(i)
+        }
+      i+=1
+      return liste
+    }
     //on decoupe l'etendue des frequences en 6 bouts en echelle logarithme
   //on realise une fonction max d'un tableau sur les amplitudes de chaque bande de frequence
   //on calcule la moyenne des 6 valeurs obtenues
@@ -34,11 +45,13 @@ object Constellation {
   
   //fonctions auxiliaires necessaires
   
-  def selection(T : Array[Array[Float]], debut : Int, n : Int) : Array[Array[Float]] = {
-    //fonction qui selectionne, a partir d'un tableau T, un sous tableaux de n valeurs a partir de l'indice debut
+  def select(T : Array[Array[Float]], debut : Int, fin : Int) : Array[Array[Float]] = {
+    //fonction qui selectionne, a partir d'un tableau T
+    //un sous tableau qui commence à debut et termine à fin 
     var selec : Array[Array[Float]] = Array(Array())
-    for (i <- debut to n - debut)
-      selec +:= T(i)
+    for (i <- debut to fin){
+      selec(i-debut) = T(i)
+      }
     return selec
   }
 
