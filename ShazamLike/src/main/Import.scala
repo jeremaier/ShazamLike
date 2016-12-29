@@ -26,9 +26,9 @@ object Import {
     
     val filesNumber = directoryFilesName.length
     val filesParameters : Array[Array[Int]] = new Array(filesNumber)
-    val filesAmplitude : Array[Array[Float]] = new Array(filesNumber)
+    val filesAmplitude : Array[Array[Double]] = new Array(filesNumber)
+    //Le dossier puis le fichier puis la fft
     val filesDirectory : Array[Array[Array[Double]]] = Array.ofDim[Double](3, filesNumber, 0)
-    
     
     var directory : String = "11"
     directoryNumber match {
@@ -44,23 +44,24 @@ object Import {
       
       if(analysis.length == 3)
         filesAmplitude(i) = StereoToMono(analysis(1), analysis(2), N)
-      else filesAmplitude(i) = IntToFloat(analysis(1), N)
+      else filesAmplitude(i) = IntToDouble(analysis(1), N)
       
       filesDirectory(directoryNumber)(i) = SplitingAndFFT(filesAmplitude(i), filesParameters(i), sampleLength)
     }
+    //filesParameters(0)(0).toFloat / sampleLength
   }
   
   //Transforme une array de Int en array de Double
-  def IntToFloat(ints : Array[Int], N : Int) : Array[Float] = {
-    val floats : Array[Float] = new Array(N)
+  def IntToDouble(ints : Array[Int], N : Int) : Array[Double] = {
+    val floats : Array[Double] = new Array(N)
     for(i <- 0 to N - 1)
       floats(i) = ints(i).toFloat
     return floats
   }
   
   //Passage d'un son stereo à un son mono en faisant la moyenne des 2 canaux
-  def StereoToMono(canal1 : Array[Int], canal2 : Array[Int], N : Int) : Array[Float] = {
-    val stereo : Array[Float] = new Array(N)
+  def StereoToMono(canal1 : Array[Int], canal2 : Array[Int], N : Int) : Array[Double] = {
+    val stereo : Array[Double] = new Array(N)
     var i : Int = 0
     while (i < N) {
       stereo(i) = (canal1(i) + canal2(i)).toFloat / 2

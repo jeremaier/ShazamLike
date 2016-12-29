@@ -9,7 +9,7 @@ object BDD {
   var directoryPath : String = System.getProperty("user.dir") + "\\BDD"
   var folders : Array[File] = Array(new File(directoryPath), new File(directoryPath + "\\11"), new File(directoryPath + "\\22"), new File(directoryPath + "\\44"))
 	var cacheFiles : Array[File] = Array(new File(directoryPath + "\\cache.txt"), new File(folders(1).getAbsolutePath + "\\cache.txt"), new File(folders(2).getAbsolutePath + "\\cache.txt"), new File(folders(3).getAbsolutePath + "\\cache.txt"))
-	val modif : Array[Boolean] = Array(true, true, false, false)
+	val modif : Array[Boolean] = Array(false, false, false, false)
   var errorMessage : String = "Attention, le dossier par defaut est vide ou ne contient pas que des fichiers .wav"
 	      
   //Creation des fichiers et dossiers necessaires a l'analyse de BDD s'il n'existe pas
@@ -99,7 +99,8 @@ object BDD {
 	    for(i <- 1 to 3) {
 	      if(modif(i)) {
       	  if(IsDirectoryFilesAndWav(i - 1, peer))
-      	    DirectoryFilesAnalysis(directoryFilesName(i - 1), directoryPath, i - 1, i * 1024)
+      	    DirectoryFilesAnalysis(directoryFilesName(i - 1), directoryPath, i - 1, i match {case 3 => 4096
+      	                                                                                     case _ => i * 1024})
       	  else errorMessageWindow(peer, errorMessage)
 	      } else {
 	        var ModifErrorMessage : String = "Le dossier des sons de 11kHz est le même que pour la dernière utilisation"
