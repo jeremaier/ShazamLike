@@ -39,7 +39,7 @@ object Import {
     
     for(i <- 0 to filesNumber - 1) {
       var analysis = WavAnalysis(directoryPath + "\\" + directory + "\\" + directoryFilesName(i))
-      filesParameters(i) = Array(analysis(0)(0).toString(), analysis(0)(1).toString(), analysis(0)(2).toString(), directoryFilesName(i))
+      filesParameters(i) = Array[String](analysis(0)(0).toString(), analysis(0)(1).toString(), analysis(0)(2).toString(), directoryFilesName(i))
       var N : Int = filesParameters(i)(2).toInt
       
       if(analysis.length == 3)

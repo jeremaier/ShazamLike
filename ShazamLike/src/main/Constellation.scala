@@ -2,7 +2,7 @@ package main
 
 object Constellation {
   //Tableau de la forme[A, A, A, A, A,...]
-  //Les frequences sont k * filesParameters(0)(0).toFloat / sampleLength
+  //Les frequences sont k * frequences d'echantillonages / sampleLength
   //Le temps de ces frequences sont la taille des fenetres selectionnes * 0.1 seconde
   def empreinte(frequencyAmplitudes : Array[Double], sampleLength : Int, samplingFrequency : Int) : Array[Array[Double]] = {
     val maxFrequencies : Array[Array[Double]] = Max(frequencyAmplitudes, bandeGen(sampleLength), samplingFrequency)
@@ -33,23 +33,23 @@ object Constellation {
     val samples = frequencyAmplitudes.length / sampleLength
     val tabMax : Array[Array[Double]] = new Array(6 * samples)
     
-      for(i <- 0 to samples - 1) {
-        var firstIndex : Int = i * sampleLength
-        var max : Double = frequencyAmplitudes(firstIndex)
-        var index : Int = 0
-                
-        for(j <- 0 to bandes.length - 2) {
-          for(k <- bandes(j) to bandes(j + 1)) {
-            var l = firstIndex + k
-            
-            if (frequencyAmplitudes(l) > max) {
-              max = frequencyAmplitudes(l)
-              index = l - sampleLength * i
-            }
+    for(i <- 0 to samples - 1) {
+      var firstIndex : Int = i * sampleLength
+      var max : Double = frequencyAmplitudes(firstIndex)
+      var index : Int = 0
+              
+      for(j <- 0 to bandes.length - 2) {
+        for(k <- bandes(j) to bandes(j + 1)) {
+          var l = firstIndex + k
+          
+          if (frequencyAmplitudes(l) > max) {
+            max = frequencyAmplitudes(l)
+            index = l - sampleLength * i
           }
-          tabMax(i) = Array[Double](max, index * samplingFrequency.toFloat / sampleLength)
         }
+        tabMax(i) = Array[Double](max, index * samplingFrequency.toFloat / sampleLength)
       }
+    }
     
     return tabMax
   }
@@ -65,9 +65,9 @@ object Constellation {
     return sum.toFloat / length
   }
   
-  //Retourne le tableau des amplitudes max avec la frequence et le temps qui correspond
+  //Retourne le tableau des frequences, et le temps qui correspond, des amplitudes frequentielles au dessus de la moyenne 
   def SupMean(maxArray : Array[Array[Double]], mean : Double) : Array[Array[Double]] = {
-    var supArray : Array[Array[Double]] = Array()
+    var supArray : Array[Array[Double]] = Array[Array[Double]]()
     
     for(i <- 0 to maxArray.length - 1) {
       if(maxArray(i)(0) >= mean)

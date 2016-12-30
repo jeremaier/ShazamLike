@@ -14,7 +14,7 @@ object FFT {
     val samples : Int = N / sampleL
     val lastSampleLength : Int = N % sampleL
     val last : Array[Complex] = FillFile(ConvertSignalToComplex(copyOfRange(wav2D, N - lastSampleLength, N), lastSampleLength), sampleLength)
-    var FFT : Array[Double] = Array()
+    var FFT : Array[Double] = Array[Double]()
     
     for(i <- 0 to samples - 1) {
       var sample : Array[Complex] = new Array(sampleL)
