@@ -10,20 +10,19 @@ object FFT {
   var hamming : Array[Double] = new Array(sampleLength)
   
   //Decoupe le son à analyser en des samples de 4096 amplitudes et effectue la FFT sur chacune d'elle après avoir appliqué hamming pour retourner la liste de toutes ces FFT
-  def SplitingAndFFT(wav2D : Array[Double], parameters : Array[Int], length: Int) : Array[Double] = {
-    val N : Int = parameters(2)
-    val samples : Int = N / length
-    val lastSampleLength : Int = N % length
+  def SplitingAndFFT(wav2D : Array[Double], N : Int, sampleL : Int) : Array[Double] = {
+    val samples : Int = N / sampleL
+    val lastSampleLength : Int = N % sampleL
     val last : Array[Complex] = FillFile(ConvertSignalToComplex(copyOfRange(wav2D, N - lastSampleLength, N), lastSampleLength), sampleLength)
     var FFT : Array[Double] = Array()
     
     for(i <- 0 to samples - 1) {
-      var sample : Array[Complex] = new Array(length)
+      var sample : Array[Complex] = new Array(sampleL)
       
-      for(j <- 0 to length - 1)
-        sample(j) = ConvertToComplex(wav2D(length * i + j) * hamming(j))
+      for(j <- 0 to sampleL - 1)
+        sample(j) = ConvertToComplex(wav2D(sampleL * i + j) * hamming(j))
       
-      FFT ++= ModuleFFT(sample, length)
+      FFT ++= ModuleFFT(sample, sampleL)
     }
     
     if(N % sampleLength != 0)
@@ -31,24 +30,11 @@ object FFT {
     
     return FFT
   }
-  
-  /*
-  //On fait la moyenne de 2 samples pour ramener tous les sons a 11025Hz -> reduction du nombre de calculs + possibilite de comparer les sons de differentes frequences
-  def DownSamplingTo11(sample1 : Array[Float], sample2 : Array[Float], sampleLength : Int) : Array[Float] = {
-    val sample : Array[Float] = Array()
-    for(i <- 0 to sampleLength)
-      sample(i) = (sample1(i) + sample2(i)) / 2
-    return sample
-  }
-  
-  //Moyenne de samples 
-  def DownSamplingTo11(sample1 : Array[Float], sample2 : Array[Float], sample3 : Array[Float], sample4 : Array[Float], sampleLength : Int) : Array[Float] = 
-    return DownSamplingTo11(DownSamplingTo11(sample1, sample2, sampleLength), DownSamplingTo11(sample3, sample4, sampleLength), sampleLength)
-  */
     
   //Fenetre de Hamming
   def Hamming(sampleLength : Int) {
     val piSurN : Double = 2 * Pi / (sampleLength - 1)
+    
     for(i <- 0 to sampleLength - 1)
       hamming(i) = 0.54 - 0.46 * cos(piSurN * i)
   }
@@ -64,23 +50,12 @@ object FFT {
   //Converti chaque nombre du tableau des amplitudes du fichier en complexe
   def ConvertSignalToComplex(wav2D : Array[Double], N : Int) : Array[Complex] = {
     val wavComplex : Array[Complex] = new Array(N)
+    
     for(i <- 0 to N - 1)
       wavComplex(i) = ConvertToComplex(wav2D(i))
+    
     return wavComplex
   }
-  
-  //Comparaison binaire pour avoir la difference entre la longueur du fichier et la puissance de 2 superieure
-  //Sert à remplir de 0 le tableau d'amplitude du fichier et l'avoir d'une longueur puissance de 2 pour utiliser l'algorithme de Cooley-Tuckey
-  /*def ArrayLength(length : Int) : Int = {
-    var N : Int = length
-    var n : Int = N
-    if((n & (N - 1)) != 0)
-      do {
-        N = n
-        n &= (n - 1)
-      } while(n != 0)
-    return N - n << 1
-  }*/
   
   //FFT d'un sample, ressort une liste de frequences
   def FFTAnalysis(sample : Array[Complex], N : Int) : Array[Complex] = {
@@ -114,8 +89,10 @@ object FFT {
   def ModuleFFT(sample : Array[Complex], sampleLength : Int) : Array[Double] = {
     val module : Array[Double] = new Array(sampleLength)
     val fft : Array[Complex] = FFTAnalysis(sample, sampleLength)
+    
     for(i <- 0 to sampleLength - 1)
       module(i) = fft(i).mod()
+    
     return module
   }
 }

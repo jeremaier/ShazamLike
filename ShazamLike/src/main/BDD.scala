@@ -7,9 +7,9 @@ import Import._
 
 object BDD {
   var directoryPath : String = System.getProperty("user.dir") + "\\BDD"
-  var folders : Array[File] = Array(new File(directoryPath), new File(directoryPath + "\\11"), new File(directoryPath + "\\22"), new File(directoryPath + "\\44"))
-	var cacheFiles : Array[File] = Array(new File(directoryPath + "\\cache.txt"), new File(folders(1).getAbsolutePath + "\\cache.txt"), new File(folders(2).getAbsolutePath + "\\cache.txt"), new File(folders(3).getAbsolutePath + "\\cache.txt"))
-	val modif : Array[Boolean] = Array(false, false, false, false)
+  var folders : Array[File] = Array[File](new File(directoryPath), new File(directoryPath + "\\11"), new File(directoryPath + "\\22"), new File(directoryPath + "\\44"))
+	var cacheFiles : Array[File] = Array[File](new File(directoryPath + "\\cache.txt"), new File(folders(1).getAbsolutePath + "\\cache.txt"), new File(folders(2).getAbsolutePath + "\\cache.txt"), new File(folders(3).getAbsolutePath + "\\cache.txt"))
+	val modif : Array[Boolean] = Array[Boolean](false, false, false, false)
   var errorMessage : String = "Attention, le dossier par defaut est vide ou ne contient pas que des fichiers .wav"
 	      
   //Creation des fichiers et dossiers necessaires a l'analyse de BDD s'il n'existe pas
@@ -79,6 +79,9 @@ object BDD {
 	
 	//Va ecrire le resultat des analyses de BDD precedentes
 	def CacheWriter(i : Int) {
+	  //for (int i = 0; i < AMOUNT_OF_POINTS; i++) {
+    //fw.append(recordPoints[i] + "\t");
+    //}
 	  //Ecrire a la suite
 	  //val cacheBw : BufferedWriter = new BufferedWriter(new FileWriter(cacheFiles(0), true))
 
@@ -154,7 +157,7 @@ object BDD {
 	
 	//Changement de dossier d'analyse
 	def RefreshFoldersAndCacheDirectories() {
-	  folders = Array(new File(directoryPath), new File(directoryPath + "\\11"), new File(directoryPath + "\\22"), new File(directoryPath + "\\44"))
-	  cacheFiles = Array(new File(directoryPath + "\\cache.txt"), new File(folders(1).getAbsolutePath + "\\cache.txt"), new File(folders(2).getAbsolutePath + "\\cache.txt"), new File(folders(3).getAbsolutePath + "\\cache.txt"))
+	  folders = Array[File](new File(directoryPath), new File(directoryPath + "\\11"), new File(directoryPath + "\\22"), new File(directoryPath + "\\44"))
+	  cacheFiles = Array[File](new File(directoryPath + "\\cache.txt"), new File(folders(1).getAbsolutePath + "\\cache.txt"), new File(folders(2).getAbsolutePath + "\\cache.txt"), new File(folders(3).getAbsolutePath + "\\cache.txt"))
 	}
 }

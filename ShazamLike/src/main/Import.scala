@@ -25,7 +25,7 @@ object Import {
     Hamming(sampleLength)
     
     val filesNumber = directoryFilesName.length
-    val filesParameters : Array[Array[Int]] = new Array(filesNumber)
+    val filesParameters : Array[Array[String]] = new Array(filesNumber)
     val filesAmplitude : Array[Array[Double]] = new Array(filesNumber)
     //Le dossier puis le fichier puis la fft
     val filesDirectory : Array[Array[Array[Double]]] = Array.ofDim[Double](3, filesNumber, 0)
@@ -39,16 +39,15 @@ object Import {
     
     for(i <- 0 to filesNumber - 1) {
       var analysis = WavAnalysis(directoryPath + "\\" + directory + "\\" + directoryFilesName(i))
-      filesParameters(i) = analysis(0)
-      var N : Int = filesParameters(i)(2)
+      filesParameters(i) = Array(analysis(0)(0).toString(), analysis(0)(1).toString(), analysis(0)(2).toString(), directoryFilesName(i))
+      var N : Int = filesParameters(i)(2).toInt
       
       if(analysis.length == 3)
         filesAmplitude(i) = StereoToMono(analysis(1), analysis(2), N)
       else filesAmplitude(i) = IntToDouble(analysis(1), N)
       
-      filesDirectory(directoryNumber)(i) = SplitingAndFFT(filesAmplitude(i), filesParameters(i), sampleLength)
+      filesDirectory(directoryNumber)(i) = SplitingAndFFT(filesAmplitude(i), filesParameters(i)(2).toInt, sampleLength)
     }
-    //filesParameters(0)(0).toFloat / sampleLength
   }
   
   //Transforme une array de Int en array de Double
