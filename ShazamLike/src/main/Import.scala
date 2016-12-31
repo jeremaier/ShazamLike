@@ -3,11 +3,15 @@ package main
 import com.tncy.top.files.WavWrapper
 import com.tncy.top.files.Utils
 import Array._
-import BDD.folders
+import BDD._
 import FFT._
+import Fingerprinting.FingerPrint
+import Constellation.Spectrogram
 
 object Import {
   var sampleLength : Int = 1024
+  var fingerPrintsDirectory : Array[Array[Array[Double]]] = Array()
+  var filesNames : Array[Array[String]] = Array()
   
   //Renvoi le son en une liste de liste de nombres representant les amplitudes en fonction du temps
   def WavAnalysis(file : String) : Array[Array[Int]] = return new WavWrapper(file).getWav()
@@ -25,10 +29,11 @@ object Import {
     Hamming(sampleLength)
     
     val filesNumber = directoryFilesName.length
-    val filesParameters : Array[Array[String]] = new Array(filesNumber)
+    val filesParameters : Array[Array[Int]] = new Array(filesNumber)
     val filesAmplitude : Array[Array[Double]] = new Array(filesNumber)
     //Le dossier puis le fichier puis la fft
-    val filesDirectory : Array[Array[Array[Double]]] = Array.ofDim[Double](3, filesNumber, 0)
+    fingerPrintsDirectory = Array.ofDim[Double](3, filesNumber, 0)
+    filesNames = Array.ofDim[String](3, filesNumber)
     
     var directory : String = "11"
     directoryNumber match {
@@ -39,15 +44,25 @@ object Import {
     
     for(i <- 0 to filesNumber - 1) {
       var analysis = WavAnalysis(directoryPath + "\\" + directory + "\\" + directoryFilesName(i))
-      filesParameters(i) = Array[String](analysis(0)(0).toString(), analysis(0)(1).toString(), analysis(0)(2).toString(), directoryFilesName(i))
-      var N : Int = filesParameters(i)(2).toInt
+      filesParameters(i) = analysis(0)
+      filesNames(directoryNumber)(i) = directoryFilesName(i)
+      var N : Int = filesParameters(i)(2)
       
       if(analysis.length == 3)
         filesAmplitude(i) = StereoToMono(analysis(1), analysis(2), N)
       else filesAmplitude(i) = IntToDouble(analysis(1), N)
       
-      filesDirectory(directoryNumber)(i) = SplitingAndFFT(filesAmplitude(i), filesParameters(i)(2).toInt, sampleLength)
+      fingerPrintsDirectory(directoryNumber)(i) = FingerPrint(Spectrogram(SplitingAndFFT(filesAmplitude(i), filesParameters(i)(2), sampleLength), sampleLength, filesParameters(i)(0)))
+      
+      CacheWriter(directoryNumber, directoryFilesName(i), fingerPrintsDirectory(directoryNumber)(i))
     }
+    
+    val dateBDD : Array[String] = new Array(4)
+    
+    for(i <- 0 to 3)
+	    dateBDD(i) = folders(i).lastModified().toString()
+	    
+	  dateCacheWrite(dateBDD)
   }
   
   //Transforme une array de Int en array de Double

@@ -45,6 +45,10 @@ object BDD {
 	  
 	  cacheBr.close()
 	  
+	  dateCacheWrite(dateBDD)
+	}
+	
+	def dateCacheWrite(dateBDD : Array[String]) {
 	  val cacheBw : BufferedWriter = new BufferedWriter(new FileWriter(cacheFiles(0)))
 	  
 	  for(i <- 0 to 3) {
@@ -77,8 +81,8 @@ object BDD {
 	}
 	
 	//Lecture de l'ensemble des nombres sur une seule ligne pour reconstituer le tableau d'empreintes d'un fichier
-	def CacheReaderFingerPrint(cacheFileNumber : Int, line : Int) : Array[Array[Double]] = {
-	  val empreinte : Array[Array[Double]] = Array[Array[Double]]()
+	def CacheReaderFingerPrint(cacheFileNumber : Int, line : Int) : Array[Double] = {
+	  val empreinte : Array[Double] = Array[Double]()
   	val cacheS : Scanner = new Scanner(cacheFiles(cacheFileNumber))
 	  
 	  while (true)
@@ -91,13 +95,11 @@ object BDD {
         
         var i = 0
         
-        while(cacheS.hasNextDouble()) {
-      	  empreinte(i) = new Array(3)
-      	  
+        while(cacheS.hasNextDouble()) {      	  
       	  for(j <- 0 to 2)
-      	    empreinte(i)(j) = cacheS.nextDouble()
+      	    empreinte(i + j) = cacheS.nextDouble()
       	    
-      	  i += 1
+      	  i += 3
       	}
       } catch {case allDone : Throwable =>}
     }
@@ -108,14 +110,14 @@ object BDD {
 	}
 	
 	//Ecrit le resultat des analyses de BDD precedentes
-	def CacheWriter(cacheFileNumber : Int, songName : String, fingerPrint : Array[Array[Double]]) {
+	def CacheWriter(cacheFileNumber : Int, songName : String, fingerPrint : Array[Double]) {
   	val cachePw : PrintWriter = new PrintWriter(new BufferedWriter(new FileWriter(cacheFiles(cacheFileNumber), false)))
   	
   	cachePw.print(songName + "\t")
   	
-    for(i <- 0 to fingerPrint.length - 1) {
+    for(i <- 0 to fingerPrint.length - 1 by 3) {
   	  for(j <- 0 to 2)
-  	    cachePw.print(fingerPrint(i)(j) + "\t")
+  	    cachePw.print(fingerPrint(i + j) + "\t")
   	}
   	
   	cachePw.print("\n")
@@ -147,7 +149,23 @@ object BDD {
 	    modifReset()
 	  } else {
 	    errorMessageWindow(peer, "Aucun dossier modifié depuis la dernière utilisation")
-	    ////////////////////////////////////////////LECTURE DES FICHIERS CACHE
+	    var filesNumbers : Array[Int] = new Array[Int](3)
+	    
+	    for(i <- 0 to 2)
+	      filesNumbers(i) = directoryFilesName(i).length
+	    
+	    fingerPrintsDirectory = new Array(3)
+	    filesNames = new Array(3)
+	    
+	    for(i <- 0 to 2) {
+	      filesNames(i) = new Array[String](filesNumbers(i))
+	      fingerPrintsDirectory(i) = Array.ofDim[Double](filesNumbers(i), 0)
+	      
+	      for(j <- 0 to filesNumbers(i) - 1) {
+	        filesNames(i)(j) = CacheReaderName(i, j)
+	        fingerPrintsDirectory(i)(j) = CacheReaderFingerPrint(i, j)
+	      }
+	    }
 	  }
   }
 	

@@ -6,14 +6,14 @@ object Constellation {
   //Tableau de la forme[A, A, A, A, A,...]
   //Les frequences sont k * frequences d'echantillonages / sampleLength
   //Le temps de ces frequences sont la taille des fenetres selectionnes * 0.1 seconde
-  def empreinte(frequencyAmplitudes : Array[Double], sampleLength : Int, samplingFrequency : Int) : Array[Array[Double]] = {
-    val maxFrequencies : Array[Array[Double]] = Max(frequencyAmplitudes, bandsGeneration(sampleLength), samplingFrequency)
+  def Spectrogram(frequencyAmplitudes : Array[Double], sampleLength : Int, samplingFrequency : Int) : Array[Array[Double]] = {
+    val maxFrequencies : Array[Array[Double]] = Max(frequencyAmplitudes, BandsGeneration(sampleLength), samplingFrequency)
     
     return SupMean(maxFrequencies, Mean(frequencyAmplitudes))
   }
   
   //Generation des limites de bandes de frequences
-  def bandsGeneration(limit : Int) : Array[Int] = {
+  def BandsGeneration(limit : Int) : Array[Int] = {
     val bands : Array[Int] = new Array(7)
     var sep : Int = 10 * limit / 1024
     
