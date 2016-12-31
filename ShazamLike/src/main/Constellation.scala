@@ -1,30 +1,32 @@
 package main
 
+import scala.collection.mutable._
+
 object Constellation {
   //Tableau de la forme[A, A, A, A, A,...]
   //Les frequences sont k * frequences d'echantillonages / sampleLength
   //Le temps de ces frequences sont la taille des fenetres selectionnes * 0.1 seconde
   def empreinte(frequencyAmplitudes : Array[Double], sampleLength : Int, samplingFrequency : Int) : Array[Array[Double]] = {
-    val maxFrequencies : Array[Array[Double]] = Max(frequencyAmplitudes, bandeGen(sampleLength), samplingFrequency)
+    val maxFrequencies : Array[Array[Double]] = Max(frequencyAmplitudes, bandsGeneration(sampleLength), samplingFrequency)
     
     return SupMean(maxFrequencies, Mean(frequencyAmplitudes))
   }
   
   //Generation des limites de bandes de frequences
-  def bandeGen(limit : Int) : Array[Int] = {
-    var bandes : Array[Int] = new Array(7)
+  def bandsGeneration(limit : Int) : Array[Int] = {
+    val bands : Array[Int] = new Array(7)
     var sep : Int = 10 * limit / 1024
     
-    bandes(0) = 0
+    bands(0) = 0
 
     for(i <- 1 to 5) {
-      bandes(i) = sep
+      bands(i) = sep
       sep *= 2
     }
     
-    bandes(6) = limit / 2 - 1
+    bands(6) = limit / 2 - 1
     
-    return bandes
+    return bands
   }
 
   //Renvoi le tableau des amplitudes les plus hautes avec la frequence correspondante
@@ -67,13 +69,13 @@ object Constellation {
   
   //Retourne le tableau des frequences, et le temps qui correspond, des amplitudes frequentielles au dessus de la moyenne 
   def SupMean(maxArray : Array[Array[Double]], mean : Double) : Array[Array[Double]] = {
-    var supArray : Array[Array[Double]] = Array[Array[Double]]()
+    var supArray : ArrayBuffer[Array[Double]] = ArrayBuffer[Array[Double]]()
     
     for(i <- 0 to maxArray.length - 1) {
       if(maxArray(i)(0) >= mean)
-        supArray +:= Array[Double](maxArray(i)(1), i / 6 * 0.1)
+        supArray += Array[Double](maxArray(i)(1), i / 6 * 0.1)
     }
     
-    return supArray
+    return supArray.toArray
   }
 }

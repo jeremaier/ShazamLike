@@ -61,36 +61,65 @@ object BDD {
      modif(i) = false
 	}
 	
-	//Va lire le contenu de chaque fichier cache
-	def CacheReader(i : Int) {
-  	val cacheS : Scanner = new Scanner(cacheFiles(i))
+	//Lecture du nom du fichier qui correspond a la ligne
+	def CacheReaderName(cacheFileNumber : Int, line : Int) : String = {
+  	val cacheS : Scanner = new Scanner(cacheFiles(cacheFileNumber))
+  	var nameFile : String = ""
+	  
+  	for(i <- 0 to line - 1)
+      cacheS.nextLine()
+    
+    nameFile = cacheS.next()
+	  
+	  cacheS.close()
+	  
+	  return nameFile
+	}
+	
+	//Lecture de l'ensemble des nombres sur une seule ligne pour reconstituer le tableau d'empreintes d'un fichier
+	def CacheReaderFingerPrint(cacheFileNumber : Int, line : Int) : Array[Array[Double]] = {
+	  val empreinte : Array[Array[Double]] = Array[Array[Double]]()
+  	val cacheS : Scanner = new Scanner(cacheFiles(cacheFileNumber))
+	  
 	  while (true)
     {
       object allDone extends Exception {}
+      
       try {
-        for(i <- 0 to 4) {
-      	  for(j <- 0 to 4)
-      	    cacheS.nextDouble()
+        for(i <- 0 to line - 1)
+          cacheS.nextLine()
+        
+        var i = 0
+        
+        while(cacheS.hasNextDouble()) {
+      	  empreinte(i) = new Array(3)
+      	  
+      	  for(j <- 0 to 2)
+      	    empreinte(i)(j) = cacheS.nextDouble()
+      	    
+      	  i += 1
       	}
       } catch {case allDone : Throwable =>}
     }
+	  
 	  cacheS.close()
+	  
+	  return empreinte
 	}
 	
-	//Va ecrire le resultat des analyses de BDD precedentes
-	def CacheWriter(i : Int) {
-	  //for (int i = 0; i < AMOUNT_OF_POINTS; i++) {
-    //fw.append(recordPoints[i] + "\t");
-    //}
-	  //Ecrire a la suite
-	  //val cacheBw : BufferedWriter = new BufferedWriter(new FileWriter(cacheFiles(0), true))
-
-  	val cachePw : PrintWriter = new PrintWriter(cacheFiles(i))
-    for(i <- 0 to 4) {
-  	  for(j <- 0 to 3)
-  	    cachePw.print()
-  	  cachePw.println()
+	//Ecrit le resultat des analyses de BDD precedentes
+	def CacheWriter(cacheFileNumber : Int, songName : String, fingerPrint : Array[Array[Double]]) {
+  	val cachePw : PrintWriter = new PrintWriter(new BufferedWriter(new FileWriter(cacheFiles(cacheFileNumber), false)))
+  	
+  	cachePw.print(songName + "\t")
+  	
+    for(i <- 0 to fingerPrint.length - 1) {
+  	  for(j <- 0 to 2)
+  	    cachePw.print(fingerPrint(i)(j) + "\t")
   	}
+  	
+  	cachePw.print("\n")
+  	
 	  cachePw.close()
 	}
   
