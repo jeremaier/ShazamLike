@@ -10,8 +10,8 @@ import Constellation.Spectrogram
 
 object Import {
   var sampleLength : Int = 1024
-  var fingerPrintsDirectory : Array[Array[Array[Double]]] = Array()
-  var filesNames : Array[Array[String]] = Array()
+  var fingerPrintsDirectory : Array[Array[Array[Double]]] = Array[Array[Array[Double]]]()
+  var filesNames : Array[Array[String]] = Array[Array[String]]()
   
   //Renvoi le son en une liste de liste de nombres representant les amplitudes en fonction du temps
   def WavAnalysis(file : String) : Array[Array[Int]] = return new WavWrapper(file).getWav()
@@ -29,8 +29,8 @@ object Import {
     Hamming(sampleLength)
     
     val filesNumber = directoryFilesName.length
-    val filesParameters : Array[Array[Int]] = new Array(filesNumber)
-    val filesAmplitude : Array[Array[Double]] = new Array(filesNumber)
+    val filesParameters : Array[Array[Int]] = new Array[Array[Int]](filesNumber)
+    val filesAmplitude : Array[Array[Double]] = new Array[Array[Double]](filesNumber)
     //Le dossier puis le fichier puis la fft
     fingerPrintsDirectory = Array.ofDim[Double](3, filesNumber, 0)
     filesNames = Array.ofDim[String](3, filesNumber)
@@ -57,17 +57,19 @@ object Import {
       CacheWriter(directoryNumber, directoryFilesName(i), fingerPrintsDirectory(directoryNumber)(i))
     }
     
-    val dateBDD : Array[String] = new Array(4)
+    val dateBDD : Array[String] = new Array[String](4)
     
     for(i <- 0 to 3)
 	    dateBDD(i) = folders(i).lastModified().toString()
 	    
 	  dateCacheWrite(dateBDD)
+	  
+	  ready = true
   }
   
   //Transforme une array de Int en array de Double
   def IntToDouble(ints : Array[Int], N : Int) : Array[Double] = {
-    val floats : Array[Double] = new Array(N)
+    val floats : Array[Double] = new Array[Double](N)
     for(i <- 0 to N - 1)
       floats(i) = ints(i).toFloat
     return floats
@@ -75,7 +77,7 @@ object Import {
   
   //Passage d'un son stereo à un son mono en faisant la moyenne des 2 canaux
   def StereoToMono(canal1 : Array[Int], canal2 : Array[Int], N : Int) : Array[Double] = {
-    val stereo : Array[Double] = new Array(N)
+    val stereo : Array[Double] = new Array[Double](N)
     var i : Int = 0
     while (i < N) {
       stereo(i) = (canal1(i) + canal2(i)).toFloat / 2

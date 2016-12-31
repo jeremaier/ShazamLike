@@ -14,7 +14,7 @@ object Constellation {
   
   //Generation des limites de bandes de frequences
   def BandsGeneration(limit : Int) : Array[Int] = {
-    val bands : Array[Int] = new Array(7)
+    val bands : Array[Int] = new Array[Int](7)
     var sep : Int = 10 * limit / 1024
     
     bands(0) = 0
@@ -33,7 +33,7 @@ object Constellation {
   def Max(frequencyAmplitudes : Array[Double], bandes : Array[Int], samplingFrequency : Int) : Array[Array[Double]] = {
     val sampleLength = (bandes(6) + 1) * 2
     val samples = frequencyAmplitudes.length / sampleLength
-    val tabMax : Array[Array[Double]] = new Array(6 * samples)
+    val tabMax : Array[Array[Double]] = new Array[Array[Double]](6 * samples)
     
     for(i <- 0 to samples - 1) {
       var firstIndex : Int = i * sampleLength

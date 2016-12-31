@@ -12,6 +12,9 @@ import java.awt.Graphics
 import FFT._
 import Import._
 import BDD._
+//import Compare.Matching
+import Fingerprinting.FingerPrint
+import Constellation.Spectrogram
 
 object GUI extends SimpleSwingApplication {
   var time : Long = 0
@@ -34,22 +37,34 @@ object GUI extends SimpleSwingApplication {
 	  var width : Int = 700
   	val browseFileButton : Button =	new Button	{text	=	"Parcourir..."}
   	val browseDirectoryButton : Button =	new Button	{text	=	"Changer de dossier..."}
+    val directoryFontMetrics : FontMetrics = peer.getFontMetrics(directoryAndFileLabel.font)
+    val widthHtml : Int = directoryFontMetrics.stringWidth("</html>")
     
   	menuBar = new MenuBar {                                                               //Barre d'options
   	  contents += new Menu("Options") {                                                   //Ajout d'un menu deroulant
   	    contents += new MenuItem(swing.Action("Changer de dossier...") {
-	        val directoryBrowser = new JFileChooser(new File("."))
+	        var directoryBrowser = new JFileChooser(new File("."))
 	        directoryBrowser.setDialogTitle("Choisissez le dossier contenant les 3 dossiers de frequences differentes")
 				  directoryBrowser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
 				  
 				  //Ouverture du selecteur de dossier avec verification que l'user appuie sur ok
           if(directoryBrowser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            directoryPath = directoryBrowser.getSelectedFile().getAbsolutePath()
-            RefreshFoldersAndCacheDirectories()
-            CreateFoldersAndCache()
-            directoryFilesName = DirectoryFilesList()
-            DirectoryAnalysisLaunch(peer)
-          }
+            var directoryBrowserAbsolutePath : String = directoryBrowser.getSelectedFile().getAbsolutePath()
+            
+            if(directoryBrowserAbsolutePath != directoryPath) {
+              ready = false
+              directoryPath = directoryBrowserAbsolutePath
+              var widthDirectoryText : Int = directoryFontMetrics.stringWidth(directoryAndFileLabel.text.split("<br>").head) - widthHtml
+              
+              if(widthDirectoryText + 50 >= width || widthDirectoryText + 50 <= width)
+        	      RefreshWidth(widthDirectoryText)
+        	    
+              RefreshFoldersAndCacheDirectories()
+              CreateFoldersAndCache()
+              directoryFilesName = DirectoryFilesList()
+              DirectoryAnalysisLaunch(peer)
+            } else errorMessageWindow(peer, "Le dossier choisi est le même que précédemment")
+  	      }
   	    })
   	    
   	    contents += new Separator
@@ -83,46 +98,55 @@ object GUI extends SimpleSwingApplication {
           fileBrowser.addChoosableFileFilter(new FileNameExtensionFilter(".wav", "wav"))
 				  
           if(fileBrowser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION && IsDirectoryFiles()) {
-              filePath = fileBrowser.getSelectedFile.getAbsolutePath()
-              RefreshDirectoryAndFileText()
-              resultLabel.text = "Attente du demarrage de l'analyse"
-              startButton.text = "Lancer l'analyse"
-              startButton.enabled = true
-              println("Fichier à analyser: " + filePath)
+            filePath = fileBrowser.getSelectedFile.getAbsolutePath()
+            RefreshDirectoryAndFileText()
+            var widthFileText : Int = directoryFontMetrics.stringWidth(directoryAndFileLabel.text.split("<br>").last) - widthHtml
+      
+      	    if(widthFileText + 50 >= width || widthFileText + 50 <= width)
+      	      RefreshWidth(widthFileText)
+      	      
+            resultLabel.text = "Attente du demarrage de l'analyse"
+            startButton.text = "Lancer l'analyse"
+            startButton.enabled = true
           }
 				}
 				
 				//Reaction au clic sur le bouton de lancement d'analyse
 		    case ButtonClicked(component)	if component == startButton => {
+		      while(!ready)
+		        startButton.text = "En attente de la fin d'analyse de la BDD..."
+		        
 		      time = System.currentTimeMillis()
-		      resultLabel.text = "Analyse en cours..."
-		      var wav2D : Array[Array[Int]] = WavAnalysis(filePath)
-		      var parameters : Array[Int] = wav2D(0)
-		      println("FFT : " + SplitingAndFFT(IntToDouble(wav2D(1), parameters(2)), parameters(2), sampleLength)) /////////////////////////
-          println("Frequence d'echantillonage : " + parameters(0))
-          println("Canaux : " + parameters(1))
-          println("Echantillon : " + parameters(2))
 		      startButton.text =	"Analyse..."
 		      startButton.enabled = false
+		      RefreshResult("Analyse en cours...")
+		      var wav : Array[Array[Int]] = WavAnalysis(filePath)
+		      var sampleFrequency : Int = wav(0)(0)
+		      var channels : Int = wav(0)(1)
+		      var N : Int = wav(0)(2)
+		      var fingerPrintSample : Array[Double] = Array[Double]()
+		      var sampleL : Int = 1024
+		      
+		      sampleFrequency match {
+		        case 22050 => sampleL = 2048
+		        case 44100 => sampleL = 4096
+		        case _ => sampleL = 1024
+		      }
+		      
+		      if(channels == 1)
+		        fingerPrintSample = FingerPrint(Spectrogram(SplitingAndFFT(IntToDouble(wav(1), N), N, sampleL), sampleL, sampleFrequency))
+		      else fingerPrintSample = FingerPrint(Spectrogram(SplitingAndFFT(StereoToMono(wav(1), wav(2), N), N, sampleL), sampleL, sampleFrequency))
+
+		      //var ID : Int = Matching(fingerPrintSample, fingerPrintsDirectory(sampleL / 1024 - 1))
+		      //RefreshResult("La musique est : " + filesNames(sampleL / 1024 - 1)(ID))
+		      var widthResultText : Int = peer.getFontMetrics(resultLabel.font).stringWidth(resultLabel.text)
+		      
+		      if(widthResultText + 50 >= width || widthResultText + 50 <= width)
+	          RefreshWidth(widthResultText)
+	          
+		      RefreshFinish()
 		    }
   		}
-  	  		    
-	    /*
-	     * A mettre au niveau de l'affichage du resultat final
-	     * Suivi du refreshResultText()
-	     */
-  	  //Verification des tailles des chemins et reultat
-	    var directoryFontMetrics : FontMetrics = peer.getFontMetrics(directoryAndFileLabel.font)
-	    var widthHtml : Int = directoryFontMetrics.stringWidth("</html>")
-	    var widthDirectoryText : Int = directoryFontMetrics.stringWidth(directoryAndFileLabel.text.split("<br>").head) - widthHtml
-	    var widthFileText : Int = directoryFontMetrics.stringWidth(directoryAndFileLabel.text.split("<br>").last) - widthHtml
-	    var widthResultText : Int = peer.getFontMetrics(resultLabel.font).stringWidth(resultLabel.text)
-	    if(widthResultText + 50 >= width || widthResultText + 50 <= width)
-	      RefreshWidth(widthResultText)
-	    if(widthFileText + 50 >= width || widthFileText + 50 <= width)
-	      RefreshWidth(widthFileText)
-      if(widthDirectoryText + 50 >= width || widthDirectoryText + 50 <= width)
-	      RefreshWidth(widthDirectoryText)
   	}
   	
   	//Rafraichissement de la taille de la fenetre au cas ou l'ecriture serait plus grande que celle ci
@@ -140,6 +164,7 @@ object GUI extends SimpleSwingApplication {
     peer.setPreferredSize(new Dimension(width, 200))
     peer.setLocationRelativeTo(null)
     peer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+
     pack()
     visible = true
     
@@ -151,13 +176,13 @@ object GUI extends SimpleSwingApplication {
 	
 	//Affichage du temps ecoule pour l'analyse
 	def RefreshTime(time : Float) {timeLabel.text = "Temps écoulé pour l'analyse : " + time.toString() + " secondes"}
-
+	
 	//Rafraichissement du l'ecriture du resultat
   def RefreshResult(result : String) {resultLabel.text = result}
-
+  
   //Rafraichissement du chemin du dossier et du fichier
 	def RefreshDirectoryAndFileText() {directoryAndFileLabel.text = "<html>Dossier d'analyse : " + directoryPath + "<br>" + "Fichier à  analyser : " + filePath.split("/").last + "</html>"}
-
+	
 	//Rafraichissement du bouton de lancement d'analyse
 	def RefreshFinish() {
 	  startButton.text =	"Relancer l'analyse"

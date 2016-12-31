@@ -11,6 +11,7 @@ object BDD {
 	var cacheFiles : Array[File] = Array[File](new File(directoryPath + "\\cache.txt"), new File(folders(1).getAbsolutePath + "\\cache.txt"), new File(folders(2).getAbsolutePath + "\\cache.txt"), new File(folders(3).getAbsolutePath + "\\cache.txt"))
 	val modif : Array[Boolean] = Array[Boolean](false, false, false, false)
   var errorMessage : String = "Attention, le dossier par defaut est vide ou ne contient pas que des fichiers .wav"
+  var ready : Boolean = false
 	      
   //Creation des fichiers et dossiers necessaires a l'analyse de BDD s'il n'existe pas
   def CreateFoldersAndCache() {
@@ -23,7 +24,7 @@ object BDD {
   
 	//Verifie si le dossier BDD a ete modifie ou pas pour ne pas faire l'analyse 2 fois
 	def IsModif() {
-	  val dateBDD : Array[String] = new Array(4)
+	  val dateBDD : Array[String] = new Array[String](4)
 	  var dateMax : String = "0"
 	  for(i <- 0 to 3) {
 	    dateBDD(i) = folders(i).lastModified().toString()
@@ -154,8 +155,8 @@ object BDD {
 	    for(i <- 0 to 2)
 	      filesNumbers(i) = directoryFilesName(i).length
 	    
-	    fingerPrintsDirectory = new Array(3)
-	    filesNames = new Array(3)
+	    fingerPrintsDirectory = new Array[Array[Array[Double]]](3)
+	    filesNames = new Array[Array[String]](3)
 	    
 	    for(i <- 0 to 2) {
 	      filesNames(i) = new Array[String](filesNumbers(i))
