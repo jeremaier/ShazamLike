@@ -120,6 +120,7 @@ object GUI extends SimpleSwingApplication {
 		      RefreshResult("Analyse en cours...")
 		      var wav : Array[Double] = DownSamplingAndStereoToMono(WavAnalysis(filePath))
 		      Hamming(sampleLength)
+		      
 		      var ID : Int = IndexResult(FingerPrint(Spectrogram(SplitingAndFFT(wav, wav.length, sampleLength), sampleLength, frequencyBase)), fingerPrintsDirectory)
 		      
 		      if(ID != -1) {

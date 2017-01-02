@@ -69,14 +69,12 @@ object Constellation {
   //Retourne le tableau des frequences, et le temps qui correspond, des amplitudes frequentielles au dessus de la moyenne 
   def SupMean(maxArray : Array[Array[Double]], mean : Double) : Array[Array[Double]] = {
     val supArray : ArrayBuffer[Array[Double]] = ArrayBuffer[Array[Double]]()
-    println(mean, mean * 1, maxArray.length)
+    
     for(i <- 0 to maxArray.length - 1) {
       if(maxArray(i)(0) >= mean * 1)
         supArray += Array[Double](maxArray(i)(1), i / 6)
     }
-    
-    println(supArray.length)
-        
+            
     return supArray.toArray
   }
 }

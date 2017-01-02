@@ -22,7 +22,6 @@ object Fingerprinting {
 
       ecart += 1
     }
-    
     return emp
   }
 }
