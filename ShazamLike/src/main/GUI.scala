@@ -22,6 +22,7 @@ import java.awt.Color
 object GUI extends SimpleSwingApplication {
   var time : Long = 0
   var readyWav : Boolean = false
+  var readyBDD : Boolean = false
   val timeLabel : Label = new Label {}
   val resultLabel : Label = new Label {
     text = "Veuillez selectionner un fichier a analyser"
@@ -35,6 +36,9 @@ object GUI extends SimpleSwingApplication {
 		text	=	"Choisissez un fichier .wav a analyser"
 		enabled = false
 	}
+	val a : String = "Je_serai.wav"
+	
+	println(a)
 	
 	CreateFoldersAndCache()
 	
@@ -57,7 +61,7 @@ object GUI extends SimpleSwingApplication {
             var directoryBrowserAbsolutePath : String = directoryBrowser.getSelectedFile().getAbsolutePath()
             
             if(directoryBrowserAbsolutePath != directoryPath) {
-              RefreshReadyBDD(false, false)
+              SetReadyBDD(false)
               directoryPath = directoryBrowserAbsolutePath
               var widthDirectoryText : Int = directoryFontMetrics.stringWidth(directoryAndFileLabel.text.split("<br>").head) - widthHtml
               
@@ -109,7 +113,7 @@ object GUI extends SimpleSwingApplication {
       	      RefreshWidth(widthFileText)
       	      
             resultLabel.text = "Attente du demarrage de l'analyse"
-            readyWav = true
+            SetReadyWav(true)
           }
 				}
 				
@@ -140,7 +144,7 @@ object GUI extends SimpleSwingApplication {
 		      var ID : Int = IndexResult(fingerPrintSample, fingerPrintsDirectory(sampleLength / 1024 - 1))
 		      
 		      if(ID != -1)
-		        RefreshResult("La musique est : " + filesNames(sampleLength / 1024 - 1)(ID).split(".wav")(0))
+		        RefreshResult("La musique est : " + filesNames(sampleLength / 1024 - 1)(ID).split(".")(0))
 		      else RefreshResult("Musique inexistante dans la base de données")
 		      
 		      var widthResultText : Int = peer.getFontMetrics(resultLabel.font).stringWidth(resultLabel.text)
@@ -185,16 +189,28 @@ object GUI extends SimpleSwingApplication {
   //Rafraichissement du chemin du dossier et du fichier
 	def RefreshDirectoryAndFileText() {directoryAndFileLabel.text = "<html>Dossier d'analyse : " + directoryPath + "<br>" + "Fichier à  analyser : " + filePath.split("/").last + "</html>"}
 	
+	//Le fichier Wav est choisi
+	def SetReadyWav(ready : Boolean) {
+	  readyWav = ready
+	  RefreshReadyBDD(readyBDD, readyWav)
+	}
+	
+	//La BDD est prête
+	def SetReadyBDD(ready : Boolean) {
+	  readyBDD = ready
+	  RefreshReadyBDD(readyBDD, readyWav)
+	}
+	
 	//Rafraichissement du bouton de lancement une fois que la BDD est completement anlysee
-	def RefreshReadyBDD(readyBDD : Boolean, ready : Boolean) {
-	  if(readyBDD && (ready|| readyWav)) {
+	def RefreshReadyBDD(BDD : Boolean, wav : Boolean) {
+	  if(readyBDD && readyWav) {
 	    startButton.text = "Lancer l'analyse"
 	    startButton.enabled = true
-	  } else if(!readyBDD && !readyWav) {
-	    startButton.text = "En attente de la fin d'analyse de la BDD..."
+	  } else if(readyBDD && !readyWav) {
+	    startButton.text = "Choisissez un fichier .wav a analyser"
 	    startButton.enabled = false
 	  } else {
-		  startButton.text	=	"Choisissez un fichier .wav a analyser"
+		  startButton.text	=	"En attente de la fin d'analyse de la BDD..."
 		  startButton.enabled = false
 	  }
 	}

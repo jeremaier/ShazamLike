@@ -7,7 +7,7 @@ import BDD._
 import FFT._
 import Fingerprinting.FingerPrint
 import Constellation.Spectrogram
-import GUI.RefreshReadyBDD
+import GUI._
 
 object Import {
   var sampleLength : Int = 1024
@@ -62,7 +62,7 @@ object Import {
     
     CacheWriter(directoryNumber + 1, directoryFilesName, fingerPrintsDirectory(directoryNumber))
 	  dateCacheWrite(getDate())
-	  RefreshReadyBDD(true, false)
+	  SetReadyBDD(true)
   }
   
   //Transforme une array de Int en array de Double
