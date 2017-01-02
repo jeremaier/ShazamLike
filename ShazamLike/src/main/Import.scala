@@ -25,7 +25,7 @@ object Import {
   //Enregistre dans 2 listes differentes les parametres de chaque son et les listes des amplitudes
   //Puis lancement des FFT
   def DirectoryFilesAnalysis(directoryFilesName : Array[String], directoryPath : String, directoryNumber : Int, sampleL : Int) {
-    sampleLength = sampleL
+    SetSampleLength(sampleL)
     Hamming(sampleLength)
     
     val filesNumber = directoryFilesName.length
@@ -53,17 +53,10 @@ object Import {
       else filesAmplitude(i) = IntToDouble(analysis(1), N)
       
       fingerPrintsDirectory(directoryNumber)(i) = FingerPrint(Spectrogram(SplitingAndFFT(filesAmplitude(i), filesParameters(i)(2), sampleLength), sampleLength, filesParameters(i)(0)))
-      
-      CacheWriter(directoryNumber, directoryFilesName(i), fingerPrintsDirectory(directoryNumber)(i))
     }
     
-    val dateBDD : Array[String] = new Array[String](4)
-    
-    for(i <- 0 to 3)
-	    dateBDD(i) = folders(i).lastModified().toString()
-	    
-	  dateCacheWrite(dateBDD)
-	  
+    CacheWriter(directoryNumber + 1, directoryFilesName, fingerPrintsDirectory(directoryNumber))
+	  dateCacheWrite(getDate())
 	  ready = true
   }
   
@@ -89,4 +82,6 @@ object Import {
     	stereo(i) = (canal1(i) + canal2(i)).toFloat / 2
     */
   }
+  
+  def SetSampleLength(sampleL : Int) {sampleLength = sampleL}
 }

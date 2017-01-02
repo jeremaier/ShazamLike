@@ -4,6 +4,7 @@ import java.io._
 import java.util._
 import GUI._
 import Import._
+import scala.collection.mutable._
 
 object BDD {
   var directoryPath : String = System.getProperty("user.dir") + "\\BDD"
@@ -22,17 +23,23 @@ object BDD {
     }
 	}
   
-	//Verifie si le dossier BDD a ete modifie ou pas pour ne pas faire l'analyse 2 fois
-	def IsModif() {
-	  val dateBDD : Array[String] = new Array[String](4)
+  //Recupere les dates de derniere modification de chaque fichier
+  def getDate() : Array[String] = {
+    val dates : Array[String] = new Array[String](4)
 	  var dateMax : String = "0"
 	  for(i <- 0 to 3) {
-	    dateBDD(i) = folders(i).lastModified().toString()
-	    if(dateBDD(0) < dateBDD(i))
-	      dateMax = dateBDD(i)
+	    dates(i) = folders(i).lastModified().toString()
+	    if(dates(0) < dates(i))
+	      dateMax = dates(i)
 	  }
-	  dateBDD(0) = dateMax
-
+	  dates(0) = dateMax
+	  
+	  return dates
+  }
+  
+	//Verifie si le dossier BDD a ete modifie ou pas pour ne pas faire l'analyse 2 fois
+	def IsModif() {
+	  val dateBDD : Array[String] = getDate()
   	val cacheBr : BufferedReader = new BufferedReader(new FileReader(cacheFiles(0)))
 	  
 	  if(dateBDD(0) != cacheBr.readLine()) {
@@ -70,58 +77,58 @@ object BDD {
 	def CacheReaderName(cacheFileNumber : Int, line : Int) : String = {
   	val cacheS : Scanner = new Scanner(cacheFiles(cacheFileNumber))
   	var nameFile : String = ""
-	  
-  	for(i <- 0 to line - 1)
-      cacheS.nextLine()
-    
-    nameFile = cacheS.next()
+    object allDone extends Exception {}
+      
+    try {
+      for(i <- 0 to line - 1)
+        cacheS.nextLine()
+      
+      nameFile = cacheS.next()
+    } catch {case allDone : Throwable =>}
 	  
 	  cacheS.close()
-	  
+
 	  return nameFile
 	}
 	
 	//Lecture de l'ensemble des nombres sur une seule ligne pour reconstituer le tableau d'empreintes d'un fichier
 	def CacheReaderFingerPrint(cacheFileNumber : Int, line : Int) : Array[Double] = {
-	  val empreinte : Array[Double] = Array[Double]()
+	  val empreinte : ArrayBuffer[Double] = ArrayBuffer[Double]()
   	val cacheS : Scanner = new Scanner(cacheFiles(cacheFileNumber))
 	  
-	  while (true)
-    {
-      object allDone extends Exception {}
-      
-      try {
-        for(i <- 0 to line - 1)
-          cacheS.nextLine()
-        
-        var i = 0
-        
-        while(cacheS.hasNextDouble()) {      	  
-      	  for(j <- 0 to 2)
-      	    empreinte(i + j) = cacheS.nextDouble()
-      	    
-      	  i += 3
-      	}
-      } catch {case allDone : Throwable =>}
-    }
+    object allDone extends Exception {}
+    
+    try {
+      for(i <- 0 to line - 1)
+        cacheS.nextLine()
+
+      var i = 0
+
+      cacheS.next()
+      while(cacheS.hasNext() && !cacheS.hasNext(".")) {
+  	    empreinte += cacheS.next().toDouble
+    	  i += 1
+    	}
+    } catch {case allDone : Throwable =>}
 	  
 	  cacheS.close()
 	  
-	  return empreinte
+	  return empreinte.toArray
 	}
 	
 	//Ecrit le resultat des analyses de BDD precedentes
-	def CacheWriter(cacheFileNumber : Int, songName : String, fingerPrint : Array[Double]) {
+	def CacheWriter(cacheFileNumber : Int, songNames : Array[String], fingerPrints : Array[Array[Double]]) {
   	val cachePw : PrintWriter = new PrintWriter(new BufferedWriter(new FileWriter(cacheFiles(cacheFileNumber), false)))
-  	
-  	cachePw.print(songName + "\t")
-  	
-    for(i <- 0 to fingerPrint.length - 1 by 3) {
-  	  for(j <- 0 to 2)
-  	    cachePw.print(fingerPrint(i + j) + "\t")
+
+  	for(i <- 0 to songNames.length - 1) {
+    	cachePw.print(songNames(i) + "\t")
+    	
+      for(j <- 0 to fingerPrints(i).length - 1 by 3) {
+    	  for(k <- 0 to 2)
+    	    cachePw.print(fingerPrints(i)(j + k) + "\t")
+    	}
+    	cachePw.print("-\n")
   	}
-  	
-  	cachePw.print("\n")
   	
 	  cachePw.close()
 	}
@@ -149,8 +156,7 @@ object BDD {
 	    }
 	    modifReset()
 	  } else {
-	    errorMessageWindow(peer, "Aucun dossier modifié depuis la dernière utilisation")
-	    var filesNumbers : Array[Int] = new Array[Int](3)
+	    val filesNumbers : Array[Int] = new Array[Int](3)
 	    
 	    for(i <- 0 to 2)
 	      filesNumbers(i) = directoryFilesName(i).length
@@ -163,10 +169,13 @@ object BDD {
 	      fingerPrintsDirectory(i) = Array.ofDim[Double](filesNumbers(i), 0)
 	      
 	      for(j <- 0 to filesNumbers(i) - 1) {
-	        filesNames(i)(j) = CacheReaderName(i, j)
-	        fingerPrintsDirectory(i)(j) = CacheReaderFingerPrint(i, j)
+	        filesNames(i)(j) = CacheReaderName(i + 1, j)
+	        fingerPrintsDirectory(i)(j) = CacheReaderFingerPrint(i + 1, j)
 	      }
 	    }
+	    
+	    ready = true
+	    //errorMessageWindow(peer, "Aucun dossier modifié depuis la dernière utilisation")
 	  }
   }
 	

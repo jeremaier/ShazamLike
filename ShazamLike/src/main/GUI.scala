@@ -12,9 +12,12 @@ import java.awt.Graphics
 import FFT._
 import Import._
 import BDD._
-//import Compare.Matching
+import Compare.IndexResult
 import Fingerprinting.FingerPrint
 import Constellation.Spectrogram
+
+import  javax.swing.border._
+import java.awt.Color
 
 object GUI extends SimpleSwingApplication {
   var time : Long = 0
@@ -22,6 +25,7 @@ object GUI extends SimpleSwingApplication {
   val resultLabel : Label = new Label {
     text = "Veuillez selectionner un fichier a analyser"
     font = new Font("SansSerif", Font.PLAIN, 18)
+    border = new LineBorder(Color.BLACK)
   }
 	val directoryAndFileLabel : Label = new Label {}
 	var filePath : String = ""
@@ -40,8 +44,8 @@ object GUI extends SimpleSwingApplication {
     val directoryFontMetrics : FontMetrics = peer.getFontMetrics(directoryAndFileLabel.font)
     val widthHtml : Int = directoryFontMetrics.stringWidth("</html>")
     
-  	menuBar = new MenuBar {                                                               //Barre d'options
-  	  contents += new Menu("Options") {                                                   //Ajout d'un menu deroulant
+  	menuBar = new MenuBar {
+  	  contents += new Menu("Options") {
   	    contents += new MenuItem(swing.Action("Changer de dossier...") {
 	        var directoryBrowser = new JFileChooser(new File("."))
 	        directoryBrowser.setDialogTitle("Choisissez le dossier contenant les 3 dossiers de frequences differentes")
@@ -75,15 +79,13 @@ object GUI extends SimpleSwingApplication {
   	//Cree un panel de 6 lignes de boutons et de phrases
   	contents = new GridPanel(6, 1) {
   	  RefreshDirectoryAndFileText()
-  	  
+
   	  contents += browseFileButton
   	  contents += directoryAndFileLabel
   	  contents += new Separator()
       contents += startButton
       contents += resultLabel
       contents += timeLabel
-      browseFileButton.preferredSize = new Dimension(width, 50)
-  	  startButton.preferredSize = new Dimension(width, 50)
   	  
   		listenTo(browseFileButton)
   		listenTo(startButton)
@@ -113,38 +115,40 @@ object GUI extends SimpleSwingApplication {
 				
 				//Reaction au clic sur le bouton de lancement d'analyse
 		    case ButtonClicked(component)	if component == startButton => {
-		      while(!ready)
-		        startButton.text = "En attente de la fin d'analyse de la BDD..."
-		        
-		      time = System.currentTimeMillis()
-		      startButton.text =	"Analyse..."
-		      startButton.enabled = false
-		      RefreshResult("Analyse en cours...")
-		      var wav : Array[Array[Int]] = WavAnalysis(filePath)
-		      var sampleFrequency : Int = wav(0)(0)
-		      var channels : Int = wav(0)(1)
-		      var N : Int = wav(0)(2)
-		      var fingerPrintSample : Array[Double] = Array[Double]()
-		      var sampleL : Int = 1024
-		      
-		      sampleFrequency match {
-		        case 22050 => sampleL = 2048
-		        case 44100 => sampleL = 4096
-		        case _ => sampleL = 1024
+		      if(!ready)
+		        startButton.text = "En attente de la fin d'analyse de la BDD... (Veuillez reessayer)"
+		      else {
+  		      time = System.currentTimeMillis()
+  		      startButton.enabled = false
+  		      RefreshResult("Analyse en cours...")
+  		      var wav : Array[Array[Int]] = WavAnalysis(filePath)
+  		      var samplingFrequency : Int = wav(0)(0)
+  		      var channels : Int = wav(0)(1)
+  		      var N : Int = wav(0)(2)
+  		      var fingerPrintSample : Array[Double] = Array[Double]()
+  		      SetSampleLength(1024)
+  		      
+  		      samplingFrequency match {
+  		        case 22050 => SetSampleLength(2048)
+  		        case 44100 => SetSampleLength(4096)
+  		        case _ => SetSampleLength(1024)
+  		      }
+  		      
+  		      Hamming(sampleLength)
+  		      
+  		      if(channels == 1)
+  		        fingerPrintSample = FingerPrint(Spectrogram(SplitingAndFFT(IntToDouble(wav(1), N), N, sampleLength), sampleLength, samplingFrequency))
+  		      else fingerPrintSample = FingerPrint(Spectrogram(SplitingAndFFT(StereoToMono(wav(1), wav(2), N), N, sampleLength), sampleLength, samplingFrequency))
+  
+  		      var ID : Int = IndexResult(fingerPrintSample, fingerPrintsDirectory(sampleLength / 1024 - 1))
+  		      RefreshResult("La musique est : " + filesNames(sampleLength / 1024 - 1)(ID).split(".wav")(0))
+  		      var widthResultText : Int = peer.getFontMetrics(resultLabel.font).stringWidth(resultLabel.text)
+  		      
+  		      if(widthResultText + 50 >= width || widthResultText + 50 <= width)
+  	          RefreshWidth(widthResultText)
+  	          
+  		      RefreshFinish()
 		      }
-		      
-		      if(channels == 1)
-		        fingerPrintSample = FingerPrint(Spectrogram(SplitingAndFFT(IntToDouble(wav(1), N), N, sampleL), sampleL, sampleFrequency))
-		      else fingerPrintSample = FingerPrint(Spectrogram(SplitingAndFFT(StereoToMono(wav(1), wav(2), N), N, sampleL), sampleL, sampleFrequency))
-
-		      //var ID : Int = Matching(fingerPrintSample, fingerPrintsDirectory(sampleL / 1024 - 1))
-		      //RefreshResult("La musique est : " + filesNames(sampleL / 1024 - 1)(ID))
-		      var widthResultText : Int = peer.getFontMetrics(resultLabel.font).stringWidth(resultLabel.text)
-		      
-		      if(widthResultText + 50 >= width || widthResultText + 50 <= width)
-	          RefreshWidth(widthResultText)
-	          
-		      RefreshFinish()
 		    }
   		}
   	}
