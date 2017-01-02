@@ -43,33 +43,37 @@ object Compare {
         count append ref - matchingRate(i)(j)
     }
     
-    return CountDelta(count, maxDelta(count))
+    return maxOc(count)
   }
   
-  //fonction qui prend en argument une liste de delta 
-  //et qui retourne la valeur ayant le plus d'occurences dans la liste
-  def maxDelta(deltaTab : ArrayBuffer[Double]) : Double = {
-    var deltamax : Double = deltaTab(0)
-    
-    for(i <- 0 to deltaTab.length - 2) {
-      if(CountDelta(deltaTab, deltaTab(i + 1)) > CountDelta(deltaTab, deltaTab(i)))
-        deltamax = deltaTab(i + 1)
+  //nb d'occurences de la valeur la plus representee dans un tableau
+  def maxOc(T:ArrayBuffer[Double]):Double = {
+    var Tmax : ArrayBuffer[Double] = ArrayBuffer()
+    for(i<-0 to T.length-1){
+      Tmax append countDelta(T,T(i))
     }
-    
-    return deltamax
+    return maxi(Tmax)
   }
-
   //Prend une liste de deltas et une valeur de delta et qui ressort le nombre d'occurences de cette valeur
-  def CountDelta(deltaTab : ArrayBuffer[Double], delta : Double) : Int = {
-    var countDelta : Int = 0
-    
-    for(i <- 0 to deltaTab.length - 1) {
-      if(deltaTab(i) == delta)
-        countDelta += 1
+def countDelta(deltaTab:ArrayBuffer[Double],delta:Double):Double={
+  var countDelta:Double = 0
+  for (i<- 0 to deltaTab.length-1){
+    if (deltaTab(i)==delta){
+      countDelta+=1
     }
-    
-    return countDelta
   }
+  return countDelta
+  }
+//maximum d'un tableau
+def maxi(Tmax:ArrayBuffer[Double]):Double={
+  var occmax=Tmax(0)
+  for (i<- 1 to Tmax.length -1){
+    if(occmax<Tmax(i)){
+      occmax=Tmax(i)
+    }
+  }
+  return occmax
+}
   
   //prend un sample et une database puis renvoie l'indice du tableau database correspondant le plus a sample
   def IndexResult(sample : Array[Double], database : Array[Array[Double]]) : Int = {
