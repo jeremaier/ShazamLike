@@ -77,10 +77,12 @@ object Compare {
     
     for(i <- 0 to database.length - 1) {
       var taux = MatchingRate(sample, database(i))._1
-      var correspondingFingerprints = MatchingRate(sample, database(i))._2
       
       if(taux >= 0.8)
         id append i
+    }
+    if (id.length == 0){
+      return -1
     }
     
     for(j <- 0 to id.length - 1)
