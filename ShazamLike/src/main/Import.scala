@@ -7,6 +7,7 @@ import BDD._
 import FFT._
 import Fingerprinting.FingerPrint
 import Constellation.Spectrogram
+import GUI.RefreshReadyBDD
 
 object Import {
   var sampleLength : Int = 1024
@@ -46,18 +47,22 @@ object Import {
       var analysis = WavAnalysis(directoryPath + "\\" + directory + "\\" + directoryFilesName(i))
       filesParameters(i) = analysis(0)
       filesNames(directoryNumber)(i) = directoryFilesName(i)
-      var N : Int = filesParameters(i)(2)
+      var N : Int = 0
       
-      if(analysis.length == 3)
+      if(analysis.length == 3) {
+        N = analysis(1).length
         filesAmplitude(i) = StereoToMono(analysis(1), analysis(2), N)
-      else filesAmplitude(i) = IntToDouble(analysis(1), N)
+      } else {
+        N = filesParameters(i)(2)
+        filesAmplitude(i) = IntToDouble(analysis(1), N)
+      }
       
       fingerPrintsDirectory(directoryNumber)(i) = FingerPrint(Spectrogram(SplitingAndFFT(filesAmplitude(i), filesParameters(i)(2), sampleLength), sampleLength, filesParameters(i)(0)))
     }
     
     CacheWriter(directoryNumber + 1, directoryFilesName, fingerPrintsDirectory(directoryNumber))
 	  dateCacheWrite(getDate())
-	  ready = true
+	  RefreshReadyBDD(true, false)
   }
   
   //Transforme une array de Int en array de Double
@@ -71,16 +76,12 @@ object Import {
   //Passage d'un son stereo à un son mono en faisant la moyenne des 2 canaux
   def StereoToMono(canal1 : Array[Int], canal2 : Array[Int], N : Int) : Array[Double] = {
     val stereo : Array[Double] = new Array[Double](N)
-    var i : Int = 0
-    while (i < N) {
-      stereo(i) = (canal1(i) + canal2(i)).toFloat / 2
-      i += 1
-    }
-    return stereo
-    /*
+    
+    println(stereo.length, canal1.length, canal2.length)
     for(i <- 0 to N - 1)
     	stereo(i) = (canal1(i) + canal2(i)).toFloat / 2
-    */
+    	
+    return stereo
   }
   
   def SetSampleLength(sampleL : Int) {sampleLength = sampleL}

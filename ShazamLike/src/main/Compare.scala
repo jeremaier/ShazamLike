@@ -4,6 +4,7 @@ import scala.math._
 import scala.collection.mutable.ArrayBuffer
 
 object Compare {
+  //Renvoi a quel pourcentage les musiques sont ressemblantes
   def MatchingRate(sample : Array[Double], song : Array[Double]) : (Double, ArrayBuffer[ArrayBuffer[Double]]) = {
     val t : ArrayBuffer[ArrayBuffer[Double]] = ArrayBuffer()
     var sum : Int = 0 
@@ -81,9 +82,9 @@ object Compare {
       if(taux >= 0.8)
         id append i
     }
-    if (id.length == 0){
+    
+    if (id.length == 0)
       return -1
-    }
     
     for(j <- 0 to id.length - 1)
       nbOccu append OccurencesNumber(MatchingRate(sample, database(j))._2)

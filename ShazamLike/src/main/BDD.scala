@@ -10,9 +10,8 @@ object BDD {
   var directoryPath : String = System.getProperty("user.dir") + "\\BDD"
   var folders : Array[File] = Array[File](new File(directoryPath), new File(directoryPath + "\\11"), new File(directoryPath + "\\22"), new File(directoryPath + "\\44"))
 	var cacheFiles : Array[File] = Array[File](new File(directoryPath + "\\cache.txt"), new File(folders(1).getAbsolutePath + "\\cache.txt"), new File(folders(2).getAbsolutePath + "\\cache.txt"), new File(folders(3).getAbsolutePath + "\\cache.txt"))
-	val modif : Array[Boolean] = Array[Boolean](false, false, false, false)
+	val modif : Array[Boolean] = Array[Boolean](true, false, false, true)
   var errorMessage : String = "Attention, le dossier par defaut est vide ou ne contient pas que des fichiers .wav"
-  var ready : Boolean = false
 	      
   //Creation des fichiers et dossiers necessaires a l'analyse de BDD s'il n'existe pas
   def CreateFoldersAndCache() {
@@ -174,8 +173,7 @@ object BDD {
 	      }
 	    }
 	    
-	    ready = true
-	    //errorMessageWindow(peer, "Aucun dossier modifié depuis la dernière utilisation")
+	    RefreshReadyBDD(true, false)
 	  }
   }
 	
