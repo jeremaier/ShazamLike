@@ -11,6 +11,7 @@ object FFT {
   
   //Decoupe le son à analyser en des samples de 4096 amplitudes et effectue la FFT sur chacune d'elle après avoir appliqué hamming pour retourner la liste de toutes ces FFT
   def SplitingAndFFT(wav2D : Array[Double], N : Int, sampleL : Int) : Array[Double] = {
+    Hamming(sampleLength)
     val samples : Int = N / sampleL
     val lastSampleLength : Int = N % sampleL
     val last : Array[Complex] = FillFile(ConvertSignalToComplex(copyOfRange(wav2D, N - lastSampleLength, N), lastSampleLength), sampleL)
@@ -30,18 +31,6 @@ object FFT {
     
     return FFT
   }
-  
-  //On fait la moyenne de 2 samples pour ramener tous les sons a 11025Hz -> reduction du nombre de calculs + possibilite de comparer les sons de differentes frequences
-  def DownSamplingTo11(sample1 : Array[Float], sample2 : Array[Float], sampleLength : Int) : Array[Float] = {
-    val sample : Array[Float] = Array()
-    for(i <- 0 to sampleLength)
-      sample(i) = (sample1(i) + sample2(i)) / 2
-    return sample
-  }
-  
-  //Moyenne de samples 
-  def DownSamplingTo11(sample1 : Array[Float], sample2 : Array[Float], sample3 : Array[Float], sample4 : Array[Float], sampleLength : Int) : Array[Float] = 
-    return DownSamplingTo11(DownSamplingTo11(sample1, sample2, sampleLength), DownSamplingTo11(sample3, sample4, sampleLength), sampleLength)
     
   //Fenetre de Hamming
   def Hamming(sampleLength : Int) {

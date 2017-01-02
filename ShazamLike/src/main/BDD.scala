@@ -8,73 +8,41 @@ import scala.collection.mutable._
 
 object BDD {
   var directoryPath : String = System.getProperty("user.dir") + "\\BDD"
-  var folders : Array[File] = Array[File](new File(directoryPath), new File(directoryPath + "\\11"), new File(directoryPath + "\\22"), new File(directoryPath + "\\44"))
-	var cacheFiles : Array[File] = Array[File](new File(directoryPath + "\\cache.txt"), new File(folders(1).getAbsolutePath + "\\cache.txt"), new File(folders(2).getAbsolutePath + "\\cache.txt"), new File(folders(3).getAbsolutePath + "\\cache.txt"))
-	val modif : Array[Boolean] = Array[Boolean](false, false, false, false)
+  var folder : File = new File(directoryPath)
+	var cacheFile : File = new File(directoryPath + "\\cache.txt")
+  var dateFile : File = new File(directoryPath + "\\date.txt")
+	var modif : Boolean = false
   var errorMessage : String = "Attention, le dossier par defaut est vide ou ne contient pas que des fichiers .wav"
 	      
   //Creation des fichiers et dossiers necessaires a l'analyse de BDD s'il n'existe pas
   def CreateFoldersAndCache() {
-    for(i <- 0 to 3) {
-  	  if(!folders(i).exists())
-  	    folders(i).mkdirs()
-  	  cacheFiles(i).createNewFile()
-    }
+	  if(!folder.exists())
+	    folder.mkdirs()
+	  cacheFile.createNewFile()
+	  dateFile.createNewFile()
 	}
-  
-  //Recupere les dates de derniere modification de chaque fichier
-  def getDate() : Array[String] = {
-    val dates : Array[String] = new Array[String](4)
-	  var dateMax : String = "0"
-	  for(i <- 0 to 3) {
-	    dates(i) = folders(i).lastModified().toString()
-	    if(dates(0) < dates(i))
-	      dateMax = dates(i)
-	  }
-	  dates(0) = dateMax
-	  
-	  return dates
-  }
   
 	//Verifie si le dossier BDD a ete modifie ou pas pour ne pas faire l'analyse 2 fois
 	def IsModif() {
-	  val dateBDD : Array[String] = getDate()
-  	val cacheBr : BufferedReader = new BufferedReader(new FileReader(cacheFiles(0)))
+	  val dateBDD : String = folder.lastModified().toString()
+  	val cacheBr : BufferedReader = new BufferedReader(new FileReader(dateFile))
 	  
-	  if(dateBDD(0) != cacheBr.readLine()) {
-	    modif(0) = true
-  	  for(i <- 1 to 3) {
-  	    var date : String = cacheBr.readLine()
-    	  if(dateBDD(i) != date)
-          modif(i) = true
-  	  }
-	  }
+	  if(dateBDD != cacheBr.readLine())
+	    modif = true
 	  
 	  cacheBr.close()
-	  
 	  dateCacheWrite(dateBDD)
 	}
 	
-	def dateCacheWrite(dateBDD : Array[String]) {
-	  val cacheBw : BufferedWriter = new BufferedWriter(new FileWriter(cacheFiles(0)))
-	  
-	  for(i <- 0 to 3) {
-	    cacheBw.append(dateBDD(i))
-      cacheBw.newLine()
-	  }
-	  
+	def dateCacheWrite(dateBDD : String) {
+	  val cacheBw : BufferedWriter = new BufferedWriter(new FileWriter(dateFile))
+	  cacheBw.append(dateBDD)
 	  cacheBw.close()
-	}
-	
-	//Reinitialisation de la liste des dossiers qui ont ete modifie
-	def modifReset() {
-	 for(i <- 0 to 3)
-     modif(i) = false
 	}
 	
 	//Lecture du nom du fichier qui correspond a la ligne
 	def CacheReaderName(cacheFileNumber : Int, line : Int) : String = {
-  	val cacheS : Scanner = new Scanner(cacheFiles(cacheFileNumber))
+  	val cacheS : Scanner = new Scanner(cacheFile)
   	var nameFile : String = ""
     object allDone extends Exception {}
       
@@ -93,7 +61,7 @@ object BDD {
 	//Lecture de l'ensemble des nombres sur une seule ligne pour reconstituer le tableau d'empreintes d'un fichier
 	def CacheReaderFingerPrint(cacheFileNumber : Int, line : Int) : Array[Double] = {
 	  val empreinte : ArrayBuffer[Double] = ArrayBuffer[Double]()
-  	val cacheS : Scanner = new Scanner(cacheFiles(cacheFileNumber))
+  	val cacheS : Scanner = new Scanner(cacheFile)
 	  
     object allDone extends Exception {}
     
@@ -117,7 +85,7 @@ object BDD {
 	
 	//Ecrit le resultat des analyses de BDD precedentes
 	def CacheWriter(cacheFileNumber : Int, songNames : Array[String], fingerPrints : Array[Array[Double]]) {
-  	val cachePw : PrintWriter = new PrintWriter(new BufferedWriter(new FileWriter(cacheFiles(cacheFileNumber), false)))
+  	val cachePw : PrintWriter = new PrintWriter(new BufferedWriter(new FileWriter(cacheFile, false)))
 
   	for(i <- 0 to songNames.length - 1) {
     	cachePw.print(songNames(i) + "\t")
@@ -136,24 +104,12 @@ object BDD {
 	def DirectoryAnalysisLaunch(peer : java.awt.Component) {
 	  IsModif()
 	  
-	  if(modif(0)) {
-	    for(i <- 1 to 3) {
-	      if(modif(i)) {
-      	  if(IsDirectoryFilesAndWav(i - 1, peer))
-      	    DirectoryFilesAnalysis(directoryFilesName(i - 1), directoryPath, i - 1, i match {case 3 => 4096
-      	                                                                                     case _ => i * 1024})
-      	  else errorMessageWindow(peer, errorMessage)
-	      } else {
-	        var ModifErrorMessage : String = "Le dossier des sons de 11kHz est le même que pour la dernière utilisation"
-	        i match {
-            case 2 => ModifErrorMessage = "Le dossier des sons de 22kHz est le même que pour la dernière utilisation"
-            case 3 => ModifErrorMessage = "Le dossier des sons de 44kHz est le même que pour la dernière utilisation"
-            case _ => ModifErrorMessage = "Le dossier des sons de 11kHz est le même que pour la dernière utilisation"
-          }
-	        errorMessageWindow(peer, ModifErrorMessage)
-	      }
-	    }
-	    modifReset()
+	  if(modif) {
+  	  if(IsDirectoryFilesAndWav(peer))
+  	    DirectoryFilesAnalysis(directoryFilesNames, directoryPath)
+  	  
+  	  modif = false
+  	  errorMessageWindow(peer, "Le dossier base de donnée a été modifié depuis la dernière utilisation")
 	  } else {
 	    val filesNumbers : Array[Int] = new Array[Int](3)
 	    
@@ -212,7 +168,8 @@ object BDD {
 	
 	//Changement de dossier d'analyse
 	def RefreshFoldersAndCacheDirectories() {
-	  folders = Array[File](new File(directoryPath), new File(directoryPath + "\\11"), new File(directoryPath + "\\22"), new File(directoryPath + "\\44"))
-	  cacheFiles = Array[File](new File(directoryPath + "\\cache.txt"), new File(folders(1).getAbsolutePath + "\\cache.txt"), new File(folders(2).getAbsolutePath + "\\cache.txt"), new File(folders(3).getAbsolutePath + "\\cache.txt"))
+	  folder = new File(directoryPath)
+	  cacheFile = new File(directoryPath + "\\cache.txt")
+	  dateFile = new File(directoryPath + "\\date.txt")
 	}
 }

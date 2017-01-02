@@ -134,9 +134,7 @@ object GUI extends SimpleSwingApplication {
 		        case 44100 => SetSampleLength(4096)
 		        case _ => SetSampleLength(1024)
 		      }
-		      
-		      Hamming(sampleLength)
-		      
+		      		      
 		      if(channels == 1)
 		        fingerPrintSample = FingerPrint(Spectrogram(SplitingAndFFT(IntToDouble(wav(1), N), N, sampleLength), sampleLength, samplingFrequency))
 		      else fingerPrintSample = FingerPrint(Spectrogram(SplitingAndFFT(StereoToMono(wav(1), wav(2), N), N, sampleLength), sampleLength, samplingFrequency))
