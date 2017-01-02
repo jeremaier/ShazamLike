@@ -31,15 +31,11 @@ object GUI extends SimpleSwingApplication {
   }
 	val directoryAndFileLabel : Label = new Label {}
 	var filePath : String = ""
-	var directoryFilesName : Array[Array[String]] = DirectoryFilesList()
+	var directoryFilesName : Array[String] = DirectoryFilesList()
   val startButton : Button =	new Button {
 		text	=	"Choisissez un fichier .wav a analyser"
 		enabled = false
 	}
-	val a : String = "Je_serai.wav"
-	
-	println(a)
-	
 	CreateFoldersAndCache()
 	
 	def top = new MainFrame {
@@ -122,28 +118,14 @@ object GUI extends SimpleSwingApplication {
 		      time = System.currentTimeMillis()
 		      startButton.enabled = false
 		      RefreshResult("Analyse en cours...")
-		      var wav : Array[Array[Int]] = WavAnalysis(filePath)
-		      var samplingFrequency : Int = wav(0)(0)
-		      var channels : Int = wav(0)(1)
-		      var N : Int = wav(0)(2)
-		      var fingerPrintSample : Array[Double] = Array[Double]()
-		      SetSampleLength(1024)
+		      var wav : Array[Double] = DownSamplingAndStereoToMono(WavAnalysis(filePath))
+		      Hamming(sampleLength)
+		      var ID : Int = IndexResult(FingerPrint(Spectrogram(SplitingAndFFT(wav, wav.length, sampleLength), sampleLength, frequencyBase)), fingerPrintsDirectory)
 		      
-		      samplingFrequency match {
-		        case 22050 => SetSampleLength(2048)
-		        case 44100 => SetSampleLength(4096)
-		        case _ => SetSampleLength(1024)
-		      }
-		      		      
-		      if(channels == 1)
-		        fingerPrintSample = FingerPrint(Spectrogram(SplitingAndFFT(IntToDouble(wav(1), N), N, sampleLength), sampleLength, samplingFrequency))
-		      else fingerPrintSample = FingerPrint(Spectrogram(SplitingAndFFT(StereoToMono(wav(1), wav(2), N), N, sampleLength), sampleLength, samplingFrequency))
-
-		      var ID : Int = IndexResult(fingerPrintSample, fingerPrintsDirectory(sampleLength / 1024 - 1))
-		      
-		      if(ID != -1)
-		        RefreshResult("La musique est : " + filesNames(sampleLength / 1024 - 1)(ID).split(".")(0))
-		      else RefreshResult("Musique inexistante dans la base de données")
+		      if(ID != -1) {
+		        var songName : String = filesNames(ID)
+		        RefreshResult("La musique est : " + songName.substring(0, songName.length() - 4))
+		      } else RefreshResult("Musique inexistante dans la base de données")
 		      
 		      var widthResultText : Int = peer.getFontMetrics(resultLabel.font).stringWidth(resultLabel.text)
 		      

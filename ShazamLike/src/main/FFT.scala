@@ -11,7 +11,6 @@ object FFT {
   
   //Decoupe le son à analyser en des samples de 4096 amplitudes et effectue la FFT sur chacune d'elle après avoir appliqué hamming pour retourner la liste de toutes ces FFT
   def SplitingAndFFT(wav2D : Array[Double], N : Int, sampleL : Int) : Array[Double] = {
-    Hamming(sampleLength)
     val samples : Int = N / sampleL
     val lastSampleLength : Int = N % sampleL
     val last : Array[Complex] = FillFile(ConvertSignalToComplex(copyOfRange(wav2D, N - lastSampleLength, N), lastSampleLength), sampleL)
