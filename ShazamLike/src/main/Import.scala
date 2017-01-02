@@ -97,7 +97,7 @@ object Import {
     val stereo : Array[Double] = new Array[Double](N)
     
     for(i <- 0 to N - 1)
-    	stereo(i) = canal1(i)
+    	stereo(i) = (canal1(i) + canal2(i)) / 2
     	
     return stereo
   }
