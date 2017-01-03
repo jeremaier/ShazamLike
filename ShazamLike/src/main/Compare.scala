@@ -46,36 +46,36 @@ object Compare {
     return maxOc(count)
   }
   
-  //nb d'occurences de la valeur la plus representee dans un tableau
-  def maxOc(T:ArrayBuffer[Double]):Double = {
-    var Tmax : ArrayBuffer[Double] = ArrayBuffer()
-    for(i<-0 to T.length-1){
-      Tmax append countDelta(T,T(i))
+  //Nombre d'occurences de la valeur la plus representee dans un tableau
+  def maxOc(T : ArrayBuffer[Double]) : Double = {
+    var Tmax : ArrayBuffer[Double] = ArrayBuffer[Double]()
+    for(i <- 0 to T.length - 1) {
+      Tmax append countDelta(T, T(i))
     }
     return maxi(Tmax)
   }
-  //Prend une liste de deltas et une valeur de delta et qui ressort le nombre d'occurences de cette valeur
-def countDelta(deltaTab:ArrayBuffer[Double],delta:Double):Double={
-  var countDelta:Double = 0
-  for (i<- 0 to deltaTab.length-1){
-    if (deltaTab(i)==delta){
-      countDelta+=1
-    }
-  }
-  return countDelta
-  }
-//maximum d'un tableau
-def maxi(Tmax:ArrayBuffer[Double]):Double={
-  var occmax=Tmax(0)
-  for (i<- 1 to Tmax.length -1){
-    if(occmax<Tmax(i)){
-      occmax=Tmax(i)
-    }
-  }
-  return occmax
-}
   
-  //prend un sample et une database puis renvoie l'indice du tableau database correspondant le plus a sample
+  //Prend une liste de deltas et une valeur de delta et qui ressort le nombre d'occurences de cette valeur
+  def countDelta(deltaTab : ArrayBuffer[Double], delta : Double) : Double = {
+    var countDelta : Double = 0
+    for (i <- 0 to deltaTab.length - 1) {
+      if (deltaTab(i) == delta)
+        countDelta += 1
+    }
+    return countDelta
+  }
+  
+  //Maximum d'un tableau
+  def maxi(Tmax : ArrayBuffer[Double]) : Double = {
+    var occmax = Tmax(0)
+    for (i<- 1 to Tmax.length - 1) {
+      if(occmax < Tmax(i))
+        occmax = Tmax(i)
+    }
+    return occmax
+  }
+  
+  //Prend un sample et une database puis renvoie l'indice du tableau database correspondant le plus a sample
   def IndexResult(sample : Array[Double], database : Array[Array[Double]]) : Int = {
     val id : ArrayBuffer[Int] = ArrayBuffer[Int]()
     val nbOccu : ArrayBuffer[Double] = ArrayBuffer[Double]()
