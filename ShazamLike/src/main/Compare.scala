@@ -107,27 +107,4 @@ def maxi(Tmax:ArrayBuffer[Double]):Double={
     
     return indice
   }
-
-/*var database =Array(Array(100.0 , 200.0 , 500.0 , 400.0 , 500.0 , 600.0 , 700.0 , 800.0 , 1000.0),Array(100.0 , 200.0 , 500.0 , 400.0 , 500.0 , 600.0 , 700.0 , 800.0 , 900.0))
-var sample = Array(100.0 , 200.0 , 500.0 , 400.0 , 500.0 , 600.0 , 700.0 , 800.0 , 900.0)
-println(compare(sample,database))*/
- //var sample=Array.fill(12)(1000*math.random)
- //var song=Array.fill(12)(1000*math.random)
- /*var sample = Array(100.0 , 200.0 , 500.0 , 400.0 , 500.0 , 600.0 , 700.0 , 800.0 , 900.0)
- var song = Array(100.0 , 200.0 , 300.0 , 400.0 , 500.0 , 300.0 , 700.0 , 900.0 , 900.0 ,100.0 ,200.0 ,1000.0, 400.0 , 500.0 , 1100.0 )
-  
-  println(sample.deep.mkString("\n"))
-  println("\n")
-  println(song.deep.mkString("\n"))
-  println("\n")
- var taux = matchingRate(sample,song)._1
- var correspondingFingerprints = matchingRate(sample,song)._2
- println(taux)
- println(correspondingFingerprints)
- var cpt = nbOccurences(matchingRate(sample,song)._2)
- println(cpt)*/
-/*var array = ArrayBuffer(3.0,5.0,3.0,3.0,6.0,7.0)
-println(array)
-println(maxDelta(array))
-println(countDelta(array,maxDelta(array)))*/
 }

@@ -6,9 +6,6 @@ class Complex(val real : Double, val img : Double) {
   //Oppose d'un complexe
   def unary_- : Complex = new Complex(this.real * -1, this.img * -1)
   
-  //Conjugue
-  def unary_~ : Complex = new Complex(this.real, this.img * -1)
-  
   //Addition de 2 nombres complexes
   def +(that : Complex) : Complex = new Complex(this.real + that.real, this.img + that.img)
   

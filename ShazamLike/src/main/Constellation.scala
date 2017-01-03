@@ -71,7 +71,7 @@ object Constellation {
     val supArray : ArrayBuffer[Array[Double]] = ArrayBuffer[Array[Double]]()
     
     for(i <- 0 to maxArray.length - 1) {
-      if(maxArray(i)(0) >= mean * 1)
+      if(maxArray(i)(0) >= mean * 2)
         supArray += Array[Double](maxArray(i)(1), i / 6)
     }
             
