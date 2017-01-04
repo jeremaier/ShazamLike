@@ -37,58 +37,48 @@ object Import {
     }
     
     CacheWriter(directoryFilesName, fingerPrintsDirectory)
-	  dateCacheWrite(folder.lastModified().toString())
+	  DateCacheWrite(folder.lastModified().toString())
 	  SetReadyBDD(true)
   }
   
-  //Passage de la frequence d'echantillonage de 22050 a 11025 pour du Mono
-  def DownSampling22(wav : Array[Int], length : Int) : Array[Int] = {
-    val wav11 : Array[Int] = new Array(length / 2)
-    for(i <- 0 to length - 1 by 2)
-      wav11(i / 2) = wav(i)
-    return wav11
-  }
-  
-  //Passage de la frequence d'echantillonage de 44100 a 22050 pour du Mono
-  def DownSampling44(wav : Array[Int], length : Int) : Array[Int] = return DownSampling22(DownSampling22(wav, length), length / 2)
-  
   //Passage de la frequence d'echantillonage de 22050 a 11025 pour du Stereo
-  def DownSampling22Stereo(wav : Array[Double], length : Int) : Array[Double] = {
+  def DownSampling22(wav : Array[Double], length : Int) : Array[Double] = {
     val wav11 : Array[Double] = new Array(length / 2)
+    
     for(i <- 0 to length - 1 by 2)
       wav11(i / 2) = wav(i)
+    
     return wav11
   }
   
   //Passage de la frequence d'echantillonage de 44100 a 22050 pour du Stereo
-  def DownSampling44Stereo(wav : Array[Double], length : Int) : Array[Double] = return DownSampling22Stereo(DownSampling22Stereo(wav, length), length / 2)
+  def DownSampling44(wav : Array[Double], length : Int) : Array[Double] = return DownSampling22(DownSampling22(wav, length), length / 2)
   
   def DownSamplingAndStereoToMono(wav : Array[Array[Int]]) : Array[Double] = {
     var parameters : Array[Int] = wav(0)
     var frequency : Int = parameters(0)
     var channels : Int = parameters(1)
     var N : Int = parameters(2)
+    var doubleWav : Array[Double] = Array()
     
-    if(channels == 2) {
-      if(frequency == 44100)
-        return DownSampling44Stereo(StereoToMono(wav(1), wav(2), N), N)
-      else if(frequency == 22050)
-        return DownSampling22Stereo(StereoToMono(wav(1), wav(2), N), N)
-      else return StereoToMono(wav(1), wav(2), N)
-    } else {
-      if(frequency == 44100)
-        return IntToDouble(DownSampling44(wav(1), N), N / 4)
-      else if(frequency == 22050)
-        return IntToDouble(DownSampling22(wav(1), N), N / 2)
-      else return IntToDouble(wav(1), N)
-    }
+    if(channels == 2) 
+      doubleWav = StereoToMono(wav(1), wav(2), N)
+    else doubleWav = IntToDouble(wav(1), N)
+    
+    if(frequency == 44100)
+      return DownSampling44(doubleWav, N)
+    else if(frequency == 22050)
+      return DownSampling22(doubleWav, N)
+    else return doubleWav
   }
   
   //Transforme une array de Int en array de Double
   def IntToDouble(ints : Array[Int], N : Int) : Array[Double] = {
     val floats : Array[Double] = new Array[Double](N)
+    
     for(i <- 0 to N - 1)
       floats(i) = ints(i).toDouble
+    
     return floats
   }
   

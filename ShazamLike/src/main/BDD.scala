@@ -12,7 +12,6 @@ object BDD {
 	var cacheFile : File = new File(directoryPath + "\\cache.txt")
   var dateFile : File = new File(directoryPath + "\\date.txt")
 	var modif : Boolean = true
-  var errorMessage : String = "Attention, le dossier par defaut est vide ou ne contient pas que des fichiers .wav"
 	      
   //Creation des fichiers et dossiers necessaires a l'analyse de BDD s'il n'existe pas
   def CreateFoldersAndCache() {
@@ -31,11 +30,11 @@ object BDD {
 	    modif = true
 	  
 	  cacheBr.close()
-	  dateCacheWrite(dateBDD)
+	  DateCacheWrite(dateBDD)
 	}
 	
 	//Actualisation de la date du dossier
-	def dateCacheWrite(dateBDD : String) {
+	def DateCacheWrite(dateBDD : String) {
 	  val cacheBw : BufferedWriter = new BufferedWriter(new FileWriter(dateFile, false))
 	  cacheBw.write(dateBDD)
 	  cacheBw.close()
@@ -109,9 +108,8 @@ object BDD {
 	  if(modif) {
   	  if(IsDirectoryFilesAndWav())
   	    DirectoryFilesAnalysis(directoryFilesName, directoryPath)
-  	  
+  	  else errorOrInfoWindow("Le dossier base de donnée a été modifié ou n'existait pas", "Erreur")
   	  modif = false
-  	  //errorMessageWindow(peer, "Le dossier base de donnée a été modifié ou n'existait pas")
 	  } else {
 	    var fileNumber : Int = directoryFilesName.length
       filesNames = CacheReaderName(fileNumber)
@@ -125,13 +123,13 @@ object BDD {
 	  if(IsDirectoryFiles()) {
       for(i <- 0 to directoryFilesName.length - 1) {
         if(!directoryFilesName(i).toString().endsWith(".wav")) {
-          errorMessage = "Le dossier ne contient pas que des fichiers .wav"
+          errorOrInfoWindow("Le dossier ne contient pas que des fichiers .wav", "Erreur")
           return false
         }
 	    }
 	    return true
 	  } else {
-      errorMessage = "Le dossier des sons ne contient aucun fichier"
+	    errorOrInfoWindow("Le dossier des sons ne contient aucun fichier", "Erreur")
 	    return false
 	  }
 	}

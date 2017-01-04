@@ -67,8 +67,8 @@ object GUI extends SimpleSwingApplication {
               RefreshFoldersAndCacheDirectories()
               CreateFoldersAndCache()
               directoryFilesName = DirectoryFilesList()
-              DirectoryAnalysisLaunch()
-            } else errorMessageWindow(peer, "Le dossier choisi est le même que précédemment")
+              launchAnalysis()
+            } else errorOrInfoWindow("Le dossier choisi est le même que précédemment", "Information")
   	      }
   	    })
   	    
@@ -119,7 +119,9 @@ object GUI extends SimpleSwingApplication {
 		      startButton.enabled = false
 		      RefreshResult("Analyse en cours...")
 		      var wav : Array[Double] = DownSamplingAndStereoToMono(WavAnalysis(filePath))
-		      Hamming(sampleLength)
+		      
+		      if(hamming(0) == 0.0)
+		        Hamming(sampleLength)
 		      
 		      var ID : Int = IndexResult(FingerPrint(Spectrogram(SplitingAndFFT(wav, wav.length, sampleLength), sampleLength, frequencyBase)), fingerPrintsDirectory)
 		      
@@ -152,13 +154,10 @@ object GUI extends SimpleSwingApplication {
   	resizable = false
     peer.setPreferredSize(new Dimension(width, 250))
     peer.setLocationRelativeTo(null)
-    peer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-    pack()
-    visible = true
-	}
-	
+ 	}
+
 	//Affichage des messages d'erreur (ex : aucun fichier dans le dossier BDD)
-	def errorMessageWindow(peer : java.awt.Component, message : String) {JOptionPane.showMessageDialog(peer, message, "Erreur", JOptionPane.ERROR_MESSAGE)}
+	def errorOrInfoWindow(message : String, ErrorOrInfo : String) {JOptionPane.showMessageDialog(top.peer, message, ErrorOrInfo, JOptionPane.ERROR_MESSAGE)}
 	
 	//Affichage du temps ecoule pour l'analyse
 	def RefreshTime(time : Float) {timeLabel.text = "Temps écoulé pour l'analyse : " + time.toString() + " secondes"}
@@ -202,5 +201,19 @@ object GUI extends SimpleSwingApplication {
 	  RefreshTime((System.currentTimeMillis() - time) / 1000F)
 	}
 	
-	DirectoryAnalysisLaunch()
+	//Lancer l'analyse dans un nouveau thread
+	def launchAnalysis() {
+    SwingUtilities.invokeLater(new Runnable() {
+  		def run() {
+  			new Thread() {
+  				override def run() {
+  				  //Swing.onEDT(top.peer.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE))
+  					DirectoryAnalysisLaunch()
+  					//Swing.onEDT(top.peer.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE))
+  				}
+  			}.start()
+  		}
+  	})
+	}
+	launchAnalysis()
 }
