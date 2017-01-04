@@ -11,7 +11,7 @@ object BDD {
   var folder : File = new File(directoryPath)
 	var cacheFile : File = new File(directoryPath + "\\cache.txt")
   var dateFile : File = new File(directoryPath + "\\date.txt")
-	var modif : Boolean = false
+	var modif : Boolean = true
   var errorMessage : String = "Attention, le dossier par defaut est vide ou ne contient pas que des fichiers .wav"
 	      
   //Creation des fichiers et dossiers necessaires a l'analyse de BDD s'il n'existe pas
@@ -103,15 +103,15 @@ object BDD {
 	}
   
 	//Ensemble des verifications avant le lancement de l'analyse de la BDD
-	def DirectoryAnalysisLaunch(peer : java.awt.Component) {
+	def DirectoryAnalysisLaunch() {
 	  IsModif()
 	  
 	  if(modif) {
-  	  if(IsDirectoryFilesAndWav(peer))
+  	  if(IsDirectoryFilesAndWav())
   	    DirectoryFilesAnalysis(directoryFilesName, directoryPath)
   	  
   	  modif = false
-  	  errorMessageWindow(peer, "Le dossier base de donnée a été modifié ou n'existait pas")
+  	  //errorMessageWindow(peer, "Le dossier base de donnée a été modifié ou n'existait pas")
 	  } else {
 	    var fileNumber : Int = directoryFilesName.length
       filesNames = CacheReaderName(fileNumber)
@@ -121,7 +121,7 @@ object BDD {
   }
 	
 	//Verifie que le dossier BDD ne contient que des fichiers wav
-	def IsDirectoryFilesAndWav(peer : java.awt.Component) : Boolean = {
+	def IsDirectoryFilesAndWav() : Boolean = {
 	  if(IsDirectoryFiles()) {
       for(i <- 0 to directoryFilesName.length - 1) {
         if(!directoryFilesName(i).toString().endsWith(".wav")) {

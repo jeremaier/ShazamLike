@@ -67,7 +67,7 @@ object GUI extends SimpleSwingApplication {
               RefreshFoldersAndCacheDirectories()
               CreateFoldersAndCache()
               directoryFilesName = DirectoryFilesList()
-              DirectoryAnalysisLaunch(peer)
+              DirectoryAnalysisLaunch()
             } else errorMessageWindow(peer, "Le dossier choisi est le même que précédemment")
   	      }
   	    })
@@ -155,7 +155,6 @@ object GUI extends SimpleSwingApplication {
     peer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     pack()
     visible = true
-    DirectoryAnalysisLaunch(peer)
 	}
 	
 	//Affichage des messages d'erreur (ex : aucun fichier dans le dossier BDD)
@@ -202,4 +201,6 @@ object GUI extends SimpleSwingApplication {
 	  startButton.enabled = true
 	  RefreshTime((System.currentTimeMillis() - time) / 1000F)
 	}
+	
+	DirectoryAnalysisLaunch()
 }
