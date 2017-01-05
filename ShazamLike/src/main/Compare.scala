@@ -5,7 +5,7 @@ import scala.collection.mutable.ArrayBuffer
 
 object Compare {
   //Renvoi a quel pourcentage les musiques sont ressemblantes
-  def MatchingRate(sample : Array[Double], song : Array[Double]) : (Double, ArrayBuffer[ArrayBuffer[Double]]) = {
+  def MatchingRate(sample : Array[Array[Double]], song : Array[Array[Double]]) : (Double, ArrayBuffer[ArrayBuffer[Double]]) = {
     val t : ArrayBuffer[ArrayBuffer[Double]] = ArrayBuffer()
     var sum : Int = 0 
     var pris : Boolean = false
@@ -76,7 +76,7 @@ object Compare {
   }
   
   //Prend un sample et une database puis renvoie l'indice du tableau database correspondant le plus a sample
-  def IndexResult(sample : Array[Double], database : Array[Array[Double]]) : Int = {
+  def IndexResult(sample : Array[Array[Double]], database : Array[Array[Array[Double]]]) : Int = {
     val id : ArrayBuffer[Int] = ArrayBuffer[Int]()
     val nbOccu : ArrayBuffer[Double] = ArrayBuffer[Double]()
     

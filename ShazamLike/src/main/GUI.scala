@@ -67,7 +67,7 @@ object GUI extends SimpleSwingApplication {
               RefreshFoldersAndCacheDirectories()
               CreateFoldersAndCache()
               directoryFilesName = DirectoryFilesList()
-              launchAnalysis()
+              DirectoryAnalysisLaunch()
             } else errorOrInfoWindow("Le dossier choisi est le même que précédemment", "Information")
   	      }
   	    })
@@ -201,19 +201,5 @@ object GUI extends SimpleSwingApplication {
 	  RefreshTime((System.currentTimeMillis() - time) / 1000F)
 	}
 	
-	//Lancer l'analyse dans un nouveau thread
-	def launchAnalysis() {
-    SwingUtilities.invokeLater(new Runnable() {
-  		def run() {
-  			new Thread() {
-  				override def run() {
-  				  //Swing.onEDT(top.peer.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE))
-  					DirectoryAnalysisLaunch()
-  					//Swing.onEDT(top.peer.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE))
-  				}
-  			}.start()
-  		}
-  	})
-	}
-	launchAnalysis()
+  DirectoryAnalysisLaunch()
 }

@@ -41,15 +41,15 @@ object BDD {
 	}
 	
 	//Ecrit le resultat des analyses de BDD precedentes
-	def CacheWriter(songNames : Array[String], fingerPrints : Array[Array[Double]]) {
+	def CacheWriter(songNames : Array[String], fingerPrints : Array[Array[Array[Double]]]) {
   	val cachePw : PrintWriter = new PrintWriter(new BufferedWriter(new FileWriter(cacheFile, false)))
   	
   	for(i <- 0 to songNames.length - 1) {
     	cachePw.print(songNames(i) + "\t" + fingerPrints(i).length + "\t")
     	
-      for(j <- 0 to fingerPrints(i).length - 1 by 3) {
+      for(j <- 0 to fingerPrints(i).length - 1) {
     	  for(k <- 0 to 2)
-    	    cachePw.print(fingerPrints(i)(j + k) + "\t")
+    	    cachePw.print(fingerPrints(i)(j)(k) + "\t")
     	}
     	
     	cachePw.print("\n")
@@ -77,8 +77,8 @@ object BDD {
 	}
 	
 	//Lecture de l'ensemble des nombres sur une seule ligne pour reconstituer le tableau d'empreintes d'un fichier
-	def CacheReaderFingerPrint(fileNumber : Int) : Array[Array[Double]] = {
-	  val empreinte : Array[Array[Double]] = new Array(fileNumber)
+	def CacheReaderFingerPrint(fileNumber : Int) : Array[Array[Array[Double]]] = {
+	  val empreinte : Array[Array[Array[Double]]] = new Array(fileNumber)
   	val cacheS : Scanner = new Scanner(cacheFile)
     object allDone extends Exception {}
     
@@ -86,10 +86,11 @@ object BDD {
       for(i <- 0 to fileNumber - 1) {
         cacheS.next()
         var fingerPrintLength : Int = cacheS.next().toInt
-        var empreintePerFile : Array[Double] = new Array(fingerPrintLength)
+        var empreintePerFile : Array[Array[Double]] = new Array(fingerPrintLength)
         
-        for(j <- 0 to fingerPrintLength - 1)
-    	    empreintePerFile(j) = cacheS.next().toDouble
+        for(j <- 0 to empreintePerFile.length - 1)
+          for(k <- 0 to 2)
+    	      empreintePerFile(j)(k) = cacheS.next().toDouble
     	  
         cacheS.nextLine()
         empreinte(i) = empreintePerFile
@@ -108,7 +109,8 @@ object BDD {
 	  if(modif) {
   	  if(IsDirectoryFilesAndWav())
   	    DirectoryFilesAnalysis(directoryFilesName, directoryPath)
-  	  else errorOrInfoWindow("Le dossier base de donnée a été modifié ou n'existait pas", "Erreur")
+  	  
+  	  errorOrInfoWindow("Le dossier base de donnée a été modifié ou n'existait pas", "Erreur")
   	  modif = false
 	  } else {
 	    var fileNumber : Int = directoryFilesName.length
