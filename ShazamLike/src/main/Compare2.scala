@@ -4,15 +4,20 @@ import Import._
 
 object Compare2 {
   def FirstMatchingRate(sample : Array[Array[Double]], song : Array[Array[Double]]) : Double = {
-    var matchingTargetNumber : Int = 0
+    val hashTab = Array()
     val sampleLength : Int = sample.length
     val songLength : Int = song.length
     
-    for(i <- 0 to songLength - 1) {
-      for(j <- 0 to sampleLength - 1) {
+    for(i <- 0 to sampleLength - 1) {
+      var matchingTargetNumber : Int = 0
+      
+      for(j <- 0 to songLength - 1) {
         if(song(i) == sample(j))
           matchingTargetNumber += 1
       }
+      
+      if(matchingTargetNumber >= 4)
+        hashTab ++= song(i)
     }
     
     return matchingTargetNumber / sampleLength

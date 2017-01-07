@@ -5,8 +5,8 @@ import scala.math._
 object Fingerprinting {
   //On obtient de la constellation une liste T = [[f,t],[f,t],[f,t]...]
   //On cree des targetzones de 5 points avec pour chacune un point d'ancrage (le 3eme avant chaque targetzone)  
-  def FingerPrint(constellation : Array[Array[Double]]) : Array[Array[Double]] = {
-    val emp : Array[Array[Double]] = Array.ofDim((constellation.length - 7) * 5, 3)
+  def FingerPrint(constellation : Array[Array[Int]]) : Array[Array[Int]] = {
+    val emp : Array[Array[Int]] = Array.ofDim((constellation.length - 7) * 5, 3)
     var ancrage : Int = 0
     var ecart : Int = 3
     
@@ -21,5 +21,9 @@ object Fingerprinting {
     }
     
     return emp
+  }
+  
+  def Hash(emp : Array[Int]) : Int = {
+    return emp(0) * 10000000
   }
 }

@@ -3,11 +3,37 @@ package main
 import scala.collection.mutable._
 
 object Constellation {
-  //Tableau de la forme[A, A, A, A, A,...]
-  //Les frequences sont k * frequences d'echantillonages / sampleLength
-  //Le temps de ces frequences sont la taille des fenetres selectionnes * 0.1 seconde
-  def Spectrogram(frequencyAmplitudes : Array[Double], sampleLength : Int, samplingFrequency : Int) : Array[Array[Double]] =
-    return SupMean(Max(frequencyAmplitudes, BandsGeneration(sampleLength), samplingFrequency), Mean(frequencyAmplitudes))
+    //Renvoi le tableau des amplitudes les plus hautes avec la frequence correspondante
+  def Spectrogram(frequencyAmplitudes : Array[Double], samplingFrequency : Int, sampleLength : Int) : Array[Array[Int]] = {
+    val bands : Array[Int] = BandsGeneration(sampleLength)
+    val samples : Int = frequencyAmplitudes.length / sampleLength
+    val supArray : ArrayBuffer[Array[Int]] = ArrayBuffer[Array[Int]]()
+    val mean : Double = Mean(frequencyAmplitudes)
+    val coeffMean : Double = 2
+    
+    for(i <- 0 to samples - 1) {
+      var firstIndex : Int = i * sampleLength
+              
+      for(j <- 0 to bands.length - 2) {
+        var max : Double = frequencyAmplitudes(firstIndex)
+        var index : Int = 0
+        
+        for(k <- bands(j) + 1 to bands(j + 1)) {
+          var l = firstIndex + k
+          
+          if (frequencyAmplitudes(l) > max) {
+            max = frequencyAmplitudes(l)
+            index = l - sampleLength * i
+          }
+        }
+        
+        if(max >= mean * coeffMean)
+          supArray += Array[Int](index, i)
+      }
+    }
+    
+    return supArray.toArray
+  }
   
   //Generation des limites de bandes de frequences
   def BandsGeneration(limit : Int) : Array[Int] = {
@@ -25,35 +51,6 @@ object Constellation {
     
     return bands
   }
-
-  //Renvoi le tableau des amplitudes les plus hautes avec la frequence correspondante
-  def Max(frequencyAmplitudes : Array[Double], bandes : Array[Int], samplingFrequency : Int) : Array[Array[Double]] = {
-    val sampleLength : Int = (bandes(6) + 1) * 2
-    val samples : Int = frequencyAmplitudes.length / sampleLength
-    val tabMax : Array[Array[Double]] = new Array[Array[Double]](6 * samples)
-    
-    for(i <- 0 to samples - 1) {
-      var firstIndex : Int = i * sampleLength
-              
-      for(j <- 0 to bandes.length - 2) {
-        var max : Double = frequencyAmplitudes(firstIndex)
-        var index : Int = 0
-        
-        for(k <- bandes(j) + 1 to bandes(j + 1)) {
-          var l = firstIndex + k
-          
-          if (frequencyAmplitudes(l) > max) {
-            max = frequencyAmplitudes(l)
-            index = l - sampleLength * i
-          }
-        }
-        
-        tabMax(i * 6 + j) = Array[Double](max, index * samplingFrequency.toFloat / sampleLength)
-      }
-    }
-    
-    return tabMax
-  }
   
   //Renvoi la moyenne des amplitudes frequentielles
   def Mean(frequencyAmplitudes : Array[Double]) : Double = {
@@ -64,17 +61,5 @@ object Constellation {
       sum += frequencyAmplitudes(i)
     
     return sum / length
-  }
-  
-  //Retourne le tableau des frequences, et le temps qui correspond, des amplitudes frequentielles au dessus de la moyenne 
-  def SupMean(maxArray : Array[Array[Double]], mean : Double) : Array[Array[Double]] = {
-    val supArray : ArrayBuffer[Array[Double]] = ArrayBuffer[Array[Double]]()
-    
-    for(i <- 0 to maxArray.length - 1) {
-      if(maxArray(i)(0) >= mean * 2)
-        supArray += Array[Double](maxArray(i)(1), i / 6)
-    }
-            
-    return supArray.toArray
   }
 }

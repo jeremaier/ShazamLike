@@ -12,7 +12,7 @@ import GUI._
 object Import {
   val sampleLength : Int = 1024
   val frequencyBase : Int = 11025
-  var fingerPrintsDirectory : Array[Array[Array[Double]]] = Array[Array[Array[Double]]]()
+  var fingerPrintsDirectory : Array[Array[Array[Int]]] = Array[Array[Array[Int]]]()
   var filesNames : Array[String] = Array[String]()
   
   //Renvoi le son en une liste de liste de nombres representant les amplitudes en fonction du temps
@@ -26,14 +26,14 @@ object Import {
   def DirectoryFilesAnalysis(directoryFilesName : Array[String], directoryPath : String) {    
     val filesNumber : Int = directoryFilesName.length
     var file : Array[Double] = Array[Double]()
-    fingerPrintsDirectory = new Array[Array[Array[Double]]](filesNumber)
+    fingerPrintsDirectory = new Array[Array[Array[Int]]](filesNumber)
     filesNames = new Array[String](filesNumber)
     Hamming(sampleLength)
     
     for(i <- 0 to filesNumber - 1) {
       filesNames(i) = directoryFilesName(i)
       file = DownSamplingAndStereoToMono(WavAnalysis(directoryPath + "\\" + directoryFilesName(i)))
-      fingerPrintsDirectory(i) = FingerPrint(Spectrogram(SplitingAndFFT(file, file.length, sampleLength), sampleLength, frequencyBase))
+      fingerPrintsDirectory(i) = FingerPrint(Spectrogram(SplitingAndFFT(file, file.length, sampleLength), frequencyBase, sampleLength))
     }
     
     CacheWriter(directoryFilesName, fingerPrintsDirectory)

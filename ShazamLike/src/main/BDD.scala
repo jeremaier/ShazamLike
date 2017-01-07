@@ -41,7 +41,7 @@ object BDD {
 	}
 	
 	//Ecrit le resultat des analyses de BDD precedentes
-	def CacheWriter(songNames : Array[String], fingerPrints : Array[Array[Array[Double]]]) {
+	def CacheWriter(songNames : Array[String], fingerPrints : Array[Array[Array[Int]]]) {
   	val cachePw : PrintWriter = new PrintWriter(new BufferedWriter(new FileWriter(cacheFile, false)))
   	
   	for(i <- 0 to songNames.length - 1) {
@@ -77,8 +77,8 @@ object BDD {
 	}
 	
 	//Lecture de l'ensemble des nombres sur une seule ligne pour reconstituer le tableau d'empreintes d'un fichier
-	def CacheReaderFingerPrint(fileNumber : Int) : Array[Array[Array[Double]]] = {
-	  val empreinte : Array[Array[Array[Double]]] = new Array(fileNumber)
+	def CacheReaderFingerPrint(fileNumber : Int) : Array[Array[Array[Int]]] = {
+	  val empreinte : Array[Array[Array[Int]]] = new Array(fileNumber)
   	val cacheS : Scanner = new Scanner(cacheFile)
     object allDone extends Exception {}
     
@@ -86,11 +86,11 @@ object BDD {
       for(i <- 0 to fileNumber - 1) {
         cacheS.next()
         var fingerPrintLength : Int = cacheS.next().toInt
-        var empreintePerFile : Array[Array[Double]] = new Array(fingerPrintLength)
+        var empreintePerFile : Array[Array[Int]] = new Array(fingerPrintLength)
         
         for(j <- 0 to empreintePerFile.length - 1)
           for(k <- 0 to 2)
-    	      empreintePerFile(j)(k) = cacheS.next().toDouble
+    	      empreintePerFile(j)(k) = cacheS.next().toInt
     	  
         cacheS.nextLine()
         empreinte(i) = empreintePerFile
