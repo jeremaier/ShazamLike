@@ -12,7 +12,7 @@ import java.awt.Graphics
 import FFT._
 import Import._
 import BDD._
-//import Compare.IndexResult
+import Compare.BestMatching
 import Fingerprinting.FingerPrint
 import Constellation.Spectrogram
 
@@ -123,12 +123,12 @@ object GUI extends SimpleSwingApplication {
 		      if(hamming(0) == 0.0)
 		        Hamming(sampleLength)
 		      
-		      /*var ID : Int = IndexResult(FingerPrint(Spectrogram(SplitingAndFFT(wav, wav.length, sampleLength), frequencyBase, sampleLength)), fingerPrintsDirectory)
+		      var ID : Int = BestMatching(FingerPrint(Spectrogram(SplitingAndFFT(wav, wav.length, sampleLength), frequencyBase, sampleLength)), fingerPrintsDirectory)
 		      
 		      if(ID != -1) {
 		        var songName : String = filesNames(ID)
 		        RefreshResult("La musique est : " + songName.substring(0, songName.length() - 4))
-		      } else RefreshResult("Musique inexistante dans la base de données")*/
+		      } else RefreshResult("Musique inexistante dans la base de données")
 		      
 		      var widthResultText : Int = peer.getFontMetrics(resultLabel.font).stringWidth(resultLabel.text)
 		      

@@ -12,7 +12,7 @@ import GUI._
 object Import {
   val sampleLength : Int = 1024
   val frequencyBase : Int = 11025
-  var fingerPrintsDirectory : Array[Array[Array[Int]]] = Array[Array[Array[Int]]]()
+  var fingerPrintsDirectory : Array[Array[(Long, Int)]] = Array[Array[(Long, Int)]]()
   var filesNames : Array[String] = Array[String]()
   
   //Renvoi le son en une liste de liste de nombres representant les amplitudes en fonction du temps
@@ -26,7 +26,7 @@ object Import {
   def DirectoryFilesAnalysis(directoryFilesName : Array[String], directoryPath : String) {    
     val filesNumber : Int = directoryFilesName.length
     var file : Array[Double] = Array[Double]()
-    fingerPrintsDirectory = new Array[Array[Array[Int]]](filesNumber)
+    fingerPrintsDirectory = new Array[Array[(Long, Int)]](filesNumber)
     filesNames = new Array[String](filesNumber)
     Hamming(sampleLength)
     

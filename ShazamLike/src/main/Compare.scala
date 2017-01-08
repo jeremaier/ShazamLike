@@ -1,110 +1,76 @@
 package main
 
-import scala.math._
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable._
 
 object Compare {
-  /*//Renvoi a quel pourcentage les musiques sont ressemblantes
-  def MatchingRate(sample : Array[Array[Double]], song : Array[Array[Double]]) : (Double, ArrayBuffer[ArrayBuffer[Double]]) = {
-    val t : ArrayBuffer[ArrayBuffer[Double]] = ArrayBuffer()
-    var sum : Int = 0 
-    var pris : Boolean = false
-    var cpt : Int = 0
-    
-    for(i <- 0 to sample.length - 1 by 3) {
-      pris = false
+  def FirstStep(sample : Array[(Long, Int)], BDDSongs : Array[(Long, Int)]) : (Int, Int) = {
+    var matchingAdress : Int = 0
+    var deltaTimes : ArrayBuffer[Int] = ArrayBuffer[Int]()
+
+    for(i <- 0 to BDDSongs.length - 1) {
+      var (adressHashBDD, anchorAbsoluteTime) = BDDSongs(i)
       
-      for(j <- 0 to song.length -1 by 3) {
-        if(AverageEgal(sample(i), song(j)) && AverageEgal(sample(i + 1), song(j + 1)) && !pris) {
-          t append ArrayBuffer(sample(i), sample(i + 1), sample(i + 2), song(j), song(j + 1), song(j + 2))
-          sum += 3
-          pris = true
-          cpt += 1
-        } else if(AverageEgal(sample(i), song(j)) && AverageEgal(sample(i + 1), song(j + 1)) && pris)
-          t(cpt - 1) append (song(j), song(j + 1), song(j + 2))
+      for(j <- 0 to sample.length - 1) {
+        var (adressHashSample, pointAbsoluteTime) = sample(j)
+        
+        if(adressHashBDD == adressHashSample) {
+          matchingAdress += 1
+          deltaTimes += anchorAbsoluteTime - pointAbsoluteTime
+        }
       }
     }
     
-    return (sum / sample.length.toDouble, t)
+    return (matchingAdress, maxDelta(deltaTimes.toArray))
   }
   
-  //Renvoi si a et b sont proches de moins de 11 ou pas
-  def AverageEgal(a : Double, b : Double) : Boolean = return a < b + 11 && a > b - 11
-  
-  //Renvoie le nombre de notes ayant le meme decalage temporel 
-  def OccurencesNumber(matchingRate : ArrayBuffer[ArrayBuffer[Double]]) : Double = {
-    var ref : Double = 0.0
-    val count : ArrayBuffer[Double] = ArrayBuffer[Double]()
+  def maxDelta(deltaTimes : Array[Int]) : Int = {
+    var maxOccur : Int = 0
     
-    for (i <- 0 to matchingRate.length - 1) {
-      ref = matchingRate(i)(2)
+    for(i <- 1 to deltaTimes.length - 1) {
+      var deltaCount : Int = deltaTimes.count(_ == deltaTimes(i))
       
-      for (j <- 5 to matchingRate(i).length - 1 by 3)
-        count append ref - matchingRate(i)(j)
+      if(deltaCount > maxOccur)
+        maxOccur = deltaCount      
     }
     
-    return maxOc(count)
+    return maxOccur
   }
   
-  //Nombre d'occurences de la valeur la plus representee dans un tableau
-  def maxOc(T : ArrayBuffer[Double]) : Double = {
-    var Tmax : ArrayBuffer[Double] = ArrayBuffer[Double]()
-    for(i <- 0 to T.length - 1) {
-      Tmax append countDelta(T, T(i))
-    }
-    return maxi(Tmax)
-  }
-  
-  //Prend une liste de deltas et une valeur de delta et qui ressort le nombre d'occurences de cette valeur
-  def countDelta(deltaTab : ArrayBuffer[Double], delta : Double) : Double = {
-    var countDelta : Double = 0
-    for (i <- 0 to deltaTab.length - 1) {
-      if (deltaTab(i) == delta)
-        countDelta += 1
-    }
-    return countDelta
-  }
-  
-  //Maximum d'un tableau
-  def maxi(Tmax : ArrayBuffer[Double]) : Double = {
-    var occmax = Tmax(0)
-    for (i<- 1 to Tmax.length - 1) {
-      if(occmax < Tmax(i))
-        occmax = Tmax(i)
-    }
-    return occmax
-  }
-  
-  //Prend un sample et une database puis renvoie l'indice du tableau database correspondant le plus a sample
-  def IndexResult(sample : Array[Array[Double]], database : Array[Array[Array[Double]]]) : Int = {
-    val id : ArrayBuffer[Int] = ArrayBuffer[Int]()
-    val nbOccu : ArrayBuffer[Double] = ArrayBuffer[Double]()
+  def BestMatching(sample : Array[(Long, Int)], BDDSongs : Array[Array[(Long, Int)]]) : Int = {
+    var bestMatch : Int = -1
+    val fingerPrintsNumber : Int = BDDSongs.length
+    val matchingTimes : Array[Double] = new Array[Double](fingerPrintsNumber)
     
-    for(i <- 0 to database.length - 1) {
-      var taux = MatchingRate(sample, database(i))._1
+    for(i <- 0 to fingerPrintsNumber - 1) {
+      var matchingPoints : (Int, Int) = FirstStep(sample, BDDSongs(i))
       
-      if(taux >= 0.8)
-        id append i
+      if(matchingPoints._1 / sample.length >= 0.8)
+        matchingTimes(i) = matchingPoints._2
+      else matchingTimes(i) = 0
     }
     
-    if (id.length == 0)
-      return -1
+    var maxRate : Double = 0
     
-    for(j <- 0 to id.length - 1)
-      nbOccu append OccurencesNumber(MatchingRate(sample, database(j))._2)
-
-    return id(IndexMax(nbOccu))
+    for(i <- 0 to matchingTimes.length - 1) {
+      var rate : Double = matchingTimes(i)
+      
+      if(rate > maxRate) {
+        maxRate = rate
+        bestMatch = i
+      }
+    }
+    
+    println(matchingTimes(0))
+    
+    return bestMatch
   }
   
-  //Prend un tableau et renvoi l'indice du maximum de la liste
-  def IndexMax(T : ArrayBuffer[Double]) : Int = {
-    var indice : Int = 0
+  def ConvertToMap(list : Array[Int]) : Map[Int,Int] = {
+    var hashTable : Map[Int,Int] = Map()
     
-    for(i <- 1 to T.length - 1) {
-      if(T(i) > T(indice))
-        indice = i
-    }
+    for(i <- list)
+      hashTable += (i -> 0)
     
-    return indice
-  }*/
+    return hashTable
+  }
 }

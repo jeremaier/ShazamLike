@@ -11,7 +11,7 @@ object BDD {
   var folder : File = new File(directoryPath)
 	var cacheFile : File = new File(directoryPath + "\\cache.txt")
   var dateFile : File = new File(directoryPath + "\\date.txt")
-	var modif : Boolean = true
+	var modif : Boolean = false
 	      
   //Creation des fichiers et dossiers necessaires a l'analyse de BDD s'il n'existe pas
   def CreateFoldersAndCache() {
@@ -41,16 +41,16 @@ object BDD {
 	}
 	
 	//Ecrit le resultat des analyses de BDD precedentes
-	def CacheWriter(songNames : Array[String], fingerPrints : Array[Array[Array[Int]]]) {
+	def CacheWriter(songNames : Array[String], fingerPrints : Array[Array[(Long, Int)]]) {
   	val cachePw : PrintWriter = new PrintWriter(new BufferedWriter(new FileWriter(cacheFile, false)))
   	
   	for(i <- 0 to songNames.length - 1) {
     	cachePw.print(songNames(i) + "\t" + fingerPrints(i).length + "\t")
     	
       for(j <- 0 to fingerPrints(i).length - 1) {
-    	  for(k <- 0 to 2)
-    	    cachePw.print(fingerPrints(i)(j)(k) + "\t")
-    	}
+        var (hash, time) = fingerPrints(i)(j)
+        cachePw.print(hash + "\t" + time + "\t")
+      }
     	
     	cachePw.print("\n")
   	}
@@ -62,14 +62,11 @@ object BDD {
 	def CacheReaderName(fileNumber : Int) : Array[String] = {
   	val cacheS : Scanner = new Scanner(cacheFile)
   	var nameFile : Array[String] = new Array[String](directoryFilesName.length)
-    object allDone extends Exception {}
-    
-    try {
-      for(i <- 0 to fileNumber - 1) {
-        nameFile(i) = cacheS.next()
-        cacheS.nextLine()
-      }
-    } catch {case allDone : Throwable =>}
+  	
+    for(i <- 0 to fileNumber - 1) {
+      nameFile(i) = cacheS.next()
+      cacheS.nextLine()
+    }
 	  
 	  cacheS.close()
 	  
@@ -77,25 +74,20 @@ object BDD {
 	}
 	
 	//Lecture de l'ensemble des nombres sur une seule ligne pour reconstituer le tableau d'empreintes d'un fichier
-	def CacheReaderFingerPrint(fileNumber : Int) : Array[Array[Array[Int]]] = {
-	  val empreinte : Array[Array[Array[Int]]] = new Array(fileNumber)
+	def CacheReaderFingerPrint(fileNumber : Int) : Array[Array[(Long, Int)]] = {
+	  val empreinte : Array[Array[(Long, Int)]] = new Array(fileNumber)
   	val cacheS : Scanner = new Scanner(cacheFile)
-    object allDone extends Exception {}
     
-    try {
-      for(i <- 0 to fileNumber - 1) {
-        cacheS.next()
-        var fingerPrintLength : Int = cacheS.next().toInt
-        var empreintePerFile : Array[Array[Int]] = new Array(fingerPrintLength)
-        
-        for(j <- 0 to empreintePerFile.length - 1)
-          for(k <- 0 to 2)
-    	      empreintePerFile(j)(k) = cacheS.next().toInt
-    	  
-        cacheS.nextLine()
-        empreinte(i) = empreintePerFile
-      }
-    } catch {case allDone : Throwable =>}
+    for(i <- 0 to fileNumber - 1) {
+      cacheS.next()
+      var fingerPrintLength : Int = cacheS.next().toInt
+      empreinte(i) = new Array(fingerPrintLength)
+      
+      for(j <- 0 to empreinte(i).length - 1)
+  	    empreinte(i)(j) = (cacheS.next().toLong, cacheS.next().toInt)
+      
+      cacheS.nextLine()
+    }
 	  
 	  cacheS.close()
 	  
