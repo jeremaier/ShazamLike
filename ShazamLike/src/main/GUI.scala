@@ -2,6 +2,7 @@ package main
 
 import scala.math._
 import scala.swing._
+import scala.swing.Window
 import scala.swing.event._
 import javax.swing._
 import javax.swing.filechooser._
@@ -40,7 +41,6 @@ object GUI extends SimpleSwingApplication {
 		text	=	"Choisissez un fichier .wav a analyser"
 		enabled = false
 	}
-	var topPeer = null
 	CreateFoldersAndCache()
 	
 	//Creation de la fenetre ainsi que tout ce qui la constitue
@@ -118,8 +118,12 @@ object GUI extends SimpleSwingApplication {
 		      var ID : Int = BestMatching(FingerPrint(Spectrogram(SplitingAndFFT(wav, wav.length, sampleLength), frequencyBase, sampleLength)), fingerPrintsDirectory)
 		      
 		      if(ID != -1) {
-		        var songName : String = filesNames(ID)
-		        RefreshResult("La musique est : " + songName.substring(0, songName.length() - 12))
+		        var songName : String = ""
+		        if(filesNames(ID).contains("_"))
+		          songName = filesNames(ID).substring(0, filesNames(ID).lastIndexOf("_"))
+		        else songName = filesNames(ID)
+		        
+		        RefreshResult("La musique est : " + songName)
 		      } else RefreshResult("Musique inexistante dans la base de données")
 
 		      RefreshFinish()
@@ -134,11 +138,10 @@ object GUI extends SimpleSwingApplication {
   	resizable = false
   	visible = true
     peer.setLocationRelativeTo(null)
-    var topPeer = this.peer
  	}
-
+	
 	//Affichage des messages d'erreur (ex : aucun fichier dans le dossier BDD)
-	def errorOrInfoWindow(message : String, ErrorOrInfo : String) {JOptionPane.showMessageDialog(topPeer, message, ErrorOrInfo, JOptionPane.ERROR_MESSAGE)}
+	def errorOrInfoWindow(message : String, ErrorOrInfo : String) {JOptionPane.showMessageDialog(top.peer, message, ErrorOrInfo, JOptionPane.ERROR_MESSAGE)}
 	
 	//Affichage du temps ecoule pour l'analyse
 	def RefreshTime(time : Float) {timeLabel.text = "Temps écoulé pour l'analyse : " + time.toString() + " secondes"}

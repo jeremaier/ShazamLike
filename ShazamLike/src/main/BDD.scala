@@ -11,7 +11,7 @@ object BDD {
   var folder : File = new File(directoryPath)
 	var cacheFile : File = new File(directoryPath + "\\cache.txt")
   var dateFile : File = new File(directoryPath + "\\date.txt")
-	var modif : Boolean = true
+	var modif : Boolean = false
 	var timeAnalysis : Long = 0
 		      
   //Creation des fichiers et dossiers necessaires a l'analyse de BDD s'il n'existe pas
@@ -104,7 +104,7 @@ object BDD {
   	  if(IsDirectoryFilesAndWav())
   	    DirectoryFilesAnalysis(directoryFilesName, directoryPath)
   	  
-  	  errorOrInfoWindow("Le dossier base de donnée a été modifié ou n'existait pas", "Erreur")
+  	  //errorOrInfoWindow("Le dossier base de donnée a été modifié ou n'existait pas", "Erreur")
   	  modif = false
 	  } else {
 	    var fileNumber : Int = directoryFilesName.length
