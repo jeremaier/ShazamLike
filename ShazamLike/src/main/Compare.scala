@@ -3,52 +3,25 @@ package main
 import scala.collection.mutable._
 
 object Compare {
-  def FirstStep(sample : Array[(Long, Int)], BDDSongs : Array[(Long, Int)]) : (Int, Int) = {
-    var matchingAdress : Int = 0
-    var deltaTimes : ArrayBuffer[Int] = ArrayBuffer[Int]()
-
-    for(i <- 0 to BDDSongs.length - 1) {
-      var (adressHashBDD, anchorAbsoluteTime) = BDDSongs(i)
-      
-      for(j <- 0 to sample.length - 1) {
-        var (adressHashSample, pointAbsoluteTime) = sample(j)
-        
-        if(adressHashBDD == adressHashSample) {
-          matchingAdress += 1
-          deltaTimes += anchorAbsoluteTime - pointAbsoluteTime
-        }
-      }
-    }
-    
-    return (matchingAdress, maxDelta(deltaTimes.toArray))
-  }
-  
-  def maxDelta(deltaTimes : Array[Int]) : Int = {
-    var maxOccur : Int = 0
-    
-    for(i <- 1 to deltaTimes.length - 1) {
-      var deltaCount : Int = deltaTimes.count(_ == deltaTimes(i))
-      
-      if(deltaCount > maxOccur)
-        maxOccur = deltaCount      
-    }
-    
-    return maxOccur
-  }
-  
+  //Renvoie l'indice de la musique la plus propice à être la meme que celle de l'echantillon
   def BestMatching(sample : Array[(Long, Int)], BDDSongs : Array[Array[(Long, Int)]]) : Int = {
-    var bestMatch : Int = -1
     val fingerPrintsNumber : Int = BDDSongs.length
-    val matchingTimes : Array[Double] = new Array[Double](fingerPrintsNumber)
+    val matchingTimes : Array[Int] = new Array[Int](fingerPrintsNumber)
     
     for(i <- 0 to fingerPrintsNumber - 1) {
-      var matchingPoints : (Int, Int) = FirstStep(sample, BDDSongs(i))
+      var matchingPoints : Int = FirstStep(sample, BDDSongs(i))
       
-      if(matchingPoints._1 / sample.length >= 0.8)
-        matchingTimes(i) = matchingPoints._2
+      if(matchingPoints.toFloat / sample.length >= 0.25)
+        matchingTimes(i) = matchingPoints
       else matchingTimes(i) = 0
     }
     
+    return MaxRating(matchingTimes)
+  }
+  
+  //Renvoie le plus grand des nombres de cette liste qui correspond au nombre maximum d'occurence d'un deltaTime de chaque musique
+  def MaxRating(matchingTimes : Array[Int]) : Int = {
+    var bestMatch : Int = -1
     var maxRate : Double = 0
     
     for(i <- 0 to matchingTimes.length - 1) {
@@ -60,17 +33,39 @@ object Compare {
       }
     }
     
-    println(matchingTimes(0))
-    
     return bestMatch
   }
   
-  def ConvertToMap(list : Array[Int]) : Map[Int,Int] = {
-    var hashTable : Map[Int,Int] = Map()
+  //Compare les ensembles de points un a un et renvoie le nombre de groupes similaires et calcule les diffenrences de temps entre ceux ci
+  def FirstStep(sample : Array[(Long, Int)], BDDSongs : Array[(Long, Int)]) : Int = {
+    var deltaTimes : ArrayBuffer[Int] = ArrayBuffer[Int]()
+
+    for(i <- 0 to BDDSongs.length - 1) {
+      var (adressHashBDD, anchorAbsoluteTime) = BDDSongs(i)
+      
+      for(j <- 0 to sample.length - 1) {
+        var (adressHashSample, pointAbsoluteTime) = sample(j)
+        
+        if(adressHashBDD == adressHashSample) {
+          deltaTimes += anchorAbsoluteTime - pointAbsoluteTime
+        }
+      }
+    }
     
-    for(i <- list)
-      hashTable += (i -> 0)
+    return maxDelta(deltaTimes.toArray)
+  }
+  
+  //Renvoie le maximum d'occurences d'un nombre de cette liste
+  def maxDelta(deltaTimes : Array[Int]) : Int = {
+    var maxOccur : Int = 0
     
-    return hashTable
+    for(i <- 1 to deltaTimes.length - 1) {
+      var deltaCount : Int = deltaTimes.count(_ == deltaTimes(i))
+      
+      if(deltaCount > maxOccur)
+        maxOccur = deltaCount      
+    }
+    
+    return maxOccur
   }
 }

@@ -15,15 +15,14 @@ object Import {
   var fingerPrintsDirectory : Array[Array[(Long, Int)]] = Array[Array[(Long, Int)]]()
   var filesNames : Array[String] = Array[String]()
   
-  //Renvoi le son en une liste de liste de nombres representant les amplitudes en fonction du temps
+  //Renvoie le son en une liste de listes de nombres representant les amplitudes en fonction du temps
   def WavAnalysis(file : String) : Array[Array[Int]] = return new WavWrapper(file).getWav()
   
-  //Renvoi la liste des noms des fichiers contenu dans la BDD
+  //Renvoie la liste des noms des fichiers contenus dans la BDD
   def DirectoryFilesList() : Array[String] = return Utils.listFiles(folder.getAbsolutePath).filter(! _.contains(".txt"))
   
-  //Enregistre dans 2 listes differentes les parametres de chaque son et les listes des amplitudes
-  //Puis lancement des FFT
-  def DirectoryFilesAnalysis(directoryFilesName : Array[String], directoryPath : String) {    
+  //Enregistre dans 2 listes differentes les parametres de chaque son et les listes des amplitudes puis lancement des FFT
+  def DirectoryFilesAnalysis(directoryFilesName : Array[String], directoryPath : String) {
     val filesNumber : Int = directoryFilesName.length
     var file : Array[Double] = Array[Double]()
     fingerPrintsDirectory = new Array[Array[(Long, Int)]](filesNumber)
@@ -31,6 +30,7 @@ object Import {
     Hamming(sampleLength)
     
     for(i <- 0 to filesNumber - 1) {
+      println(filesNumber - i)
       filesNames(i) = directoryFilesName(i)
       file = DownSamplingAndStereoToMono(WavAnalysis(directoryPath + "\\" + directoryFilesName(i)))
       fingerPrintsDirectory(i) = FingerPrint(Spectrogram(SplitingAndFFT(file, file.length, sampleLength), frequencyBase, sampleLength))
@@ -39,9 +39,10 @@ object Import {
     CacheWriter(directoryFilesName, fingerPrintsDirectory)
 	  DateCacheWrite(folder.lastModified().toString())
 	  SetReadyBDD(true)
+	  println("Création des empreintes terminée en : " + (System.currentTimeMillis() - timeAnalysis) / 1000F)
   }
   
-  //Passage de la frequence d'echantillonage de 22050 a 11025 pour du Stereo
+  //Passage de la frequence d'echantillonage de 22050 a 11025
   def DownSampling22(wav : Array[Double], length : Int) : Array[Double] = {
     val wav11 : Array[Double] = new Array(length / 2)
     
@@ -51,9 +52,10 @@ object Import {
     return wav11
   }
   
-  //Passage de la frequence d'echantillonage de 44100 a 22050 pour du Stereo
+  //Passage de la frequence d'echantillonage de 44100 a 22050
   def DownSampling44(wav : Array[Double], length : Int) : Array[Double] = return DownSampling22(DownSampling22(wav, length), length / 2)
   
+  //Passe n'importe quel type de musique en musique mono de frequence d'echantillonnage 11025Hz
   def DownSamplingAndStereoToMono(wav : Array[Array[Int]]) : Array[Double] = {
     var parameters : Array[Int] = wav(0)
     var frequency : Int = parameters(0)
@@ -72,7 +74,7 @@ object Import {
     else return doubleWav
   }
   
-  //Transforme une array de Int en array de Double
+  //Transforme une lsite de Int en liste de Double
   def IntToDouble(ints : Array[Int], N : Int) : Array[Double] = {
     val floats : Array[Double] = new Array[Double](N)
     
@@ -82,13 +84,13 @@ object Import {
     return floats
   }
   
-  //Passage d'un son stereo à un son mono en faisant la moyenne des 2 canaux
+  //Passage d'un son stereo à un son mono en faisant la moyenne des 2 canaux contenant les amplitudes frequencielles
   def StereoToMono(canal1 : Array[Int], canal2 : Array[Int], N : Int) : Array[Double] = {
-    val stereo : Array[Double] = new Array[Double](N)
+    val stereoFrequencies : Array[Double] = new Array[Double](N)
     
     for(i <- 0 to N - 1)
-    	stereo(i) = (canal1(i) + canal2(i)) / 2
+    	stereoFrequencies(i) = (canal1(i) + canal2(i)) / 2
     	
-    return stereo
+    return stereoFrequencies
   }
 }

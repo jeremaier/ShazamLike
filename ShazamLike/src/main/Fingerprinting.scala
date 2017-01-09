@@ -6,8 +6,7 @@ import scala.collection.mutable.Map
 object Fingerprinting {
   val errorFactor : Int = 2
 
-  //On obtient de la constellation une liste T = [[f,t],[f,t],[f,t]...]
-  //On cree des targetzones de 5 points avec pour chacune un point d'ancrage (le 3eme avant chaque targetzone)
+  //Renvoie l'empreinte d'un musique en creant des hash de groupe de 4 points et leur temps absolu dans la musique correspondant
   def FingerPrint(constellation : Array[Array[Int]]) : Array[(Long, Int)] = {
     val emp : Array[(Long, Int)] = new Array(constellation.length - 3)
     
@@ -17,7 +16,7 @@ object Fingerprinting {
     return emp
   }
   
-  //Creation du hash à partir des frequences et deltaTime
+  //Creation du hash à partir d'un groupe de 4 points
   def Hash(targetZone : Array[Int]) : Long = 
     return (((targetZone(3) - (targetZone(3) % errorFactor)).toLong * 100000000) + (targetZone(2) - (targetZone(2) % errorFactor)) * 100000 + (targetZone(1) - (targetZone(1) % errorFactor)) * 100 + (targetZone(0) - (targetZone(0) % errorFactor)))
 }

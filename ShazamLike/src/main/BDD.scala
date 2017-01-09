@@ -11,8 +11,9 @@ object BDD {
   var folder : File = new File(directoryPath)
 	var cacheFile : File = new File(directoryPath + "\\cache.txt")
   var dateFile : File = new File(directoryPath + "\\date.txt")
-	var modif : Boolean = false
-	      
+	var modif : Boolean = true
+	var timeAnalysis : Long = 0
+		      
   //Creation des fichiers et dossiers necessaires a l'analyse de BDD s'il n'existe pas
   def CreateFoldersAndCache() {
 	  if(!folder.exists())
@@ -21,7 +22,7 @@ object BDD {
 	  dateFile.createNewFile()
 	}
   
-	//Verifie si le dossier BDD a ete modifie ou pas pour ne pas faire l'analyse 2 fois
+	//Verifie si le dossier BDD a ete modifie ou pas depuis le dernier demarrage
 	def IsModif() {
 	  val dateBDD : String = folder.lastModified().toString()
   	val cacheBr : BufferedReader = new BufferedReader(new FileReader(dateFile))
@@ -33,14 +34,14 @@ object BDD {
 	  DateCacheWrite(dateBDD)
 	}
 	
-	//Actualisation de la date du dossier
+	//Actualisation de la date du dossier dans le fichier date.txt
 	def DateCacheWrite(dateBDD : String) {
 	  val cacheBw : BufferedWriter = new BufferedWriter(new FileWriter(dateFile, false))
 	  cacheBw.write(dateBDD)
 	  cacheBw.close()
 	}
 	
-	//Ecrit le resultat des analyses de BDD precedentes
+	//Ecrit le resultat des analyses de BDD dans le cache.txt
 	def CacheWriter(songNames : Array[String], fingerPrints : Array[Array[(Long, Int)]]) {
   	val cachePw : PrintWriter = new PrintWriter(new BufferedWriter(new FileWriter(cacheFile, false)))
   	
@@ -58,7 +59,7 @@ object BDD {
 	  cachePw.close()
 	}
 	
-	//Lecture du nom du fichier qui correspond a la ligne
+	//Lecture des noms des fichiers dans cache.txt qui sont presents dans la BDD
 	def CacheReaderName(fileNumber : Int) : Array[String] = {
   	val cacheS : Scanner = new Scanner(cacheFile)
   	var nameFile : Array[String] = new Array[String](directoryFilesName.length)
@@ -73,7 +74,7 @@ object BDD {
 	  return nameFile
 	}
 	
-	//Lecture de l'ensemble des nombres sur une seule ligne pour reconstituer le tableau d'empreintes d'un fichier
+	//Lecture de l'ensemble des empreintes de chaque musique presente dans la BDD
 	def CacheReaderFingerPrint(fileNumber : Int) : Array[Array[(Long, Int)]] = {
 	  val empreinte : Array[Array[(Long, Int)]] = new Array(fileNumber)
   	val cacheS : Scanner = new Scanner(cacheFile)
@@ -94,8 +95,9 @@ object BDD {
 	  return empreinte
 	}
   
-	//Ensemble des verifications avant le lancement de l'analyse de la BDD
+	//Ensemble des verifications avant le lancement soit de la creation d'empreintes soit de la lecture dans les fichiers de ces empreintes
 	def DirectoryAnalysisLaunch() {
+	  timeAnalysis = System.currentTimeMillis()
 	  IsModif()
 	  
 	  if(modif) {
@@ -109,6 +111,7 @@ object BDD {
       filesNames = CacheReaderName(fileNumber)
       fingerPrintsDirectory = CacheReaderFingerPrint(fileNumber)
 	    SetReadyBDD(true)
+	    println("Analyse du cache terminée en : " + (System.currentTimeMillis() - timeAnalysis) / 1000F)
 	  }
   }
 	

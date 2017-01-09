@@ -3,7 +3,7 @@ package main
 import scala.collection.mutable._
 
 object Constellation {
-    //Renvoi le tableau des amplitudes les plus hautes avec la frequence correspondante
+  //Renvoie le tableau des amplitudes les plus hautes et sa frequence correspondante d'une musique
   def Spectrogram(frequencyAmplitudes : Array[Double], samplingFrequency : Int, sampleLength : Int) : Array[Array[Int]] = {
     val bands : Array[Int] = BandsGeneration(sampleLength)
     val samples : Int = frequencyAmplitudes.length / sampleLength
@@ -52,7 +52,7 @@ object Constellation {
     return bands
   }
   
-  //Renvoi la moyenne des amplitudes frequentielles
+  //Renvoie la moyenne des amplitudes frequentielles de l'ensemble du son
   def Mean(frequencyAmplitudes : Array[Double]) : Double = {
     var sum : Double = 0
     val length : Int = frequencyAmplitudes.length

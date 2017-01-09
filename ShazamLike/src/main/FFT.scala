@@ -9,7 +9,7 @@ import Import._
 object FFT {
   var hamming : Array[Double] = new Array[Double](sampleLength)
   
-  //Decoupe le son à analyser en des samples de 4096 amplitudes et effectue la FFT sur chacune d'elle après avoir appliqué hamming pour retourner la liste de toutes ces FFT
+  //Decoupe le son à analyser en des samples et effectue la FFT sur chacune d'elles apres avoir appliqué hamming pour retourner la liste de toutes ces FFT concatenes
   def SplitingAndFFT(wav2D : Array[Double], N : Int, sampleL : Int) : Array[Double] = {
     val samples : Int = N / sampleL
     val lastSampleLength : Int = N % sampleL
@@ -39,7 +39,7 @@ object FFT {
       hamming(i) = 0.54 - 0.46 * cos(piSurN * i)
   }
   
-  //Appelle la fonction FFT avec comme argument les parties du fichier de la bonne longueur (en puissance de 2)
+  //Rempli un tableau de 0 jusqu'a atteindre une certaine longueur
   def FillFile(last : Array[Complex], sampleLength : Int) : Array[Complex] = {
     val wavLength = last.length
     var wav : Array[Complex] = new Array[Complex](sampleLength)
@@ -57,7 +57,7 @@ object FFT {
     return wavComplex
   }
   
-  //FFT d'un sample, ressort une liste de frequences
+  //FFT d'un sample, ressort une liste de frequences de ce sample
   def FFTAnalysis(sample : Array[Complex], N : Int) : Array[Complex] = {
     if (N == 1) return sample
     

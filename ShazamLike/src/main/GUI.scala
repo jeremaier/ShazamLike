@@ -5,7 +5,9 @@ import scala.swing._
 import scala.swing.event._
 import javax.swing._
 import javax.swing.filechooser._
+import javax.swing.border._
 import java.io._
+import java.awt.Color
 import java.awt.Font
 import java.awt.FontMetrics
 import java.awt.Graphics
@@ -16,8 +18,7 @@ import Compare.BestMatching
 import Fingerprinting.FingerPrint
 import Constellation.Spectrogram
 
-import  javax.swing.border._
-import java.awt.Color
+import java.util.regex._
 
 object GUI extends SimpleSwingApplication {
   var time : Long = 0
@@ -31,24 +32,23 @@ object GUI extends SimpleSwingApplication {
   }
 	val directoryAndFileLabel : Label = new Label {}
 	var filePath : String = ""
+	var currentFolder : String = "."
 	var directoryFilesName : Array[String] = DirectoryFilesList()
+  val browseFileButton : Button =	new Button	{text	=	"Parcourir..."}
+  val browseDirectoryButton : Button =	new Button	{text	=	"Changer de dossier..."}
   val startButton : Button =	new Button {
 		text	=	"Choisissez un fichier .wav a analyser"
 		enabled = false
 	}
+	var topPeer = null
 	CreateFoldersAndCache()
 	
+	//Creation de la fenetre ainsi que tout ce qui la constitue
 	def top = new MainFrame {
-	  var width : Int = 700
-  	val browseFileButton : Button =	new Button	{text	=	"Parcourir..."}
-  	val browseDirectoryButton : Button =	new Button	{text	=	"Changer de dossier..."}
-    val directoryFontMetrics : FontMetrics = peer.getFontMetrics(directoryAndFileLabel.font)
-    val widthHtml : Int = directoryFontMetrics.stringWidth("</html>")
-    
   	menuBar = new MenuBar {
   	  contents += new Menu("Options") {
   	    contents += new MenuItem(swing.Action("Changer de dossier...") {
-	        var directoryBrowser = new JFileChooser(new File("."))
+	        var directoryBrowser = new JFileChooser(new File(currentFolder))
 	        directoryBrowser.setDialogTitle("Choisissez le dossier contenant les 3 dossiers de frequences differentes")
 				  directoryBrowser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
 				  
@@ -57,13 +57,9 @@ object GUI extends SimpleSwingApplication {
             var directoryBrowserAbsolutePath : String = directoryBrowser.getSelectedFile().getAbsolutePath()
             
             if(directoryBrowserAbsolutePath != directoryPath) {
+              currentFolder = directoryBrowserAbsolutePath
               SetReadyBDD(false)
               directoryPath = directoryBrowserAbsolutePath
-              var widthDirectoryText : Int = directoryFontMetrics.stringWidth(directoryAndFileLabel.text.split("<br>").head) - widthHtml
-              
-              if(widthDirectoryText + 50 >= width || widthDirectoryText + 50 <= width)
-        	      RefreshWidth(widthDirectoryText)
-        	    
               RefreshFoldersAndCacheDirectories()
               CreateFoldersAndCache()
               directoryFilesName = DirectoryFilesList()
@@ -77,7 +73,7 @@ object GUI extends SimpleSwingApplication {
   	  }
   	}
   	
-  	//Cree un panel de 6 lignes de boutons et de phrases
+  	//Cree un panel de 6 lignes de boutons et de labels
   	contents = new GridPanel(6, 1) {
   	  RefreshDirectoryAndFileText()
 
@@ -94,7 +90,7 @@ object GUI extends SimpleSwingApplication {
   		reactions += {
   	    //Ouverture du selecteur de fichiers avec verification que l'utilisateur appuie sur OK et qu
 				case ButtonClicked(component) if component == browseFileButton => {          
-				  val fileBrowser : JFileChooser = new JFileChooser(new File("."))
+				  val fileBrowser : JFileChooser = new JFileChooser(new File(currentFolder))
 				  fileBrowser.setFileSelectionMode(JFileChooser.FILES_ONLY)
 				  fileBrowser.setDialogTitle("Choisir un son")
           fileBrowser.setAcceptAllFileFilterUsed(false)
@@ -102,12 +98,8 @@ object GUI extends SimpleSwingApplication {
 				  
           if(fileBrowser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION && IsDirectoryFiles()) {
             filePath = fileBrowser.getSelectedFile.getAbsolutePath()
+            currentFolder = filePath.substring(0, filePath.lastIndexOf("\\"))
             RefreshDirectoryAndFileText()
-            var widthFileText : Int = directoryFontMetrics.stringWidth(directoryAndFileLabel.text.split("<br>").last) - widthHtml
-      
-      	    if(widthFileText + 50 >= width || widthFileText + 50 <= width)
-      	      RefreshWidth(widthFileText)
-      	      
             resultLabel.text = "Attente du demarrage de l'analyse"
             SetReadyWav(true)
           }
@@ -127,37 +119,26 @@ object GUI extends SimpleSwingApplication {
 		      
 		      if(ID != -1) {
 		        var songName : String = filesNames(ID)
-		        RefreshResult("La musique est : " + songName.substring(0, songName.length() - 4))
+		        RefreshResult("La musique est : " + songName.substring(0, songName.length() - 12))
 		      } else RefreshResult("Musique inexistante dans la base de données")
-		      
-		      var widthResultText : Int = peer.getFontMetrics(resultLabel.font).stringWidth(resultLabel.text)
-		      
-		      if(widthResultText + 50 >= width || widthResultText + 50 <= width)
-	          RefreshWidth(widthResultText)
-	          
+
 		      RefreshFinish()
 		    }
   		}
   	}
   	
-  	//Rafraichissement de la taille de la fenetre au cas ou l'ecriture serait plus grande que celle ci
-  	def RefreshWidth(widthResultText : Int) {
-  	  width = widthResultText + 50
-      peer.setPreferredSize(new Dimension(width, 250))
-      peer.repaint()
-      peer.validate()
-	  }
-  	
-  	title = "Shazam Like"
-  	val icon : ImageIcon = new ImageIcon("shazam.png");
-    peer.setIconImage(icon.getImage());
+  	title = "Shazam"
+  	val icon : ImageIcon = new ImageIcon("shazam.png")
+    peer.setIconImage(icon.getImage())
+    peer.setSize(800, 300)
   	resizable = false
-    peer.setPreferredSize(new Dimension(width, 250))
+  	visible = true
     peer.setLocationRelativeTo(null)
+    var topPeer = this.peer
  	}
 
 	//Affichage des messages d'erreur (ex : aucun fichier dans le dossier BDD)
-	def errorOrInfoWindow(message : String, ErrorOrInfo : String) {JOptionPane.showMessageDialog(top.peer, message, ErrorOrInfo, JOptionPane.ERROR_MESSAGE)}
+	def errorOrInfoWindow(message : String, ErrorOrInfo : String) {JOptionPane.showMessageDialog(topPeer, message, ErrorOrInfo, JOptionPane.ERROR_MESSAGE)}
 	
 	//Affichage du temps ecoule pour l'analyse
 	def RefreshTime(time : Float) {timeLabel.text = "Temps écoulé pour l'analyse : " + time.toString() + " secondes"}
@@ -166,7 +147,7 @@ object GUI extends SimpleSwingApplication {
   def RefreshResult(result : String) {resultLabel.text = result}
   
   //Rafraichissement du chemin du dossier et du fichier
-	def RefreshDirectoryAndFileText() {directoryAndFileLabel.text = "<html>Dossier d'analyse : " + directoryPath + "<br>" + "Fichier à  analyser : " + filePath.split("/").last + "</html>"}
+	def RefreshDirectoryAndFileText() {directoryAndFileLabel.text = "<html>Dossier d'analyse : " + directoryPath + "<br>" + "Fichier à  analyser : " + filePath.substring(filePath.lastIndexOf("\\") + 1, filePath.length()) + "</html>"}
 	
 	//Le fichier Wav est choisi
 	def SetReadyWav(ready : Boolean) {
